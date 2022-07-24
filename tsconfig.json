@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "target": "ES5",
+    "module": "commonjs",
+    "allowJs": false,
+    "jsx": "react",
+    "jsxFactory": "h",
+    "sourceMap": true,
+    "strict": true,
+    "moduleResolution": "Node",
+    "baseUrl": "./src",
+    "preserveSymlinks": true,
+    "types": ["node"],
+    "lib": ["es2017", "dom"]
+  },
+  "include": ["src/**/*.tsx", "src/**/*.ts", "custom.d.ts", "node_modules/kaltura-player-js/ts-typed"]
+}

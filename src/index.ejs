@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="<%- htmlWebpackPlugin.options.description %>">
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <title>
+        <%- htmlWebpackPlugin.options.title %>
+    </title>
+</head>
+
+<body>
+    <h3>Annoto Kaltura Playkit Plugin</h3>
+
+    <div id="kaltura_player_541994816" style="width: calc(100% - 350px); height: 560px;"></div>
+    <script src="https://cdnapisec.kaltura.com/p/2302901/embedPlaykitJs/uiconf_id/50617632"></script>
+    <!-- <script src="https://raw.githack.com/kaltura/playkit-js-ui-managers/master/dist/playkit-ui-managers.js"></script> -->
+    
+    
+    <%= htmlWebpackPlugin.tags.bodyTags %>
+
+    <script type="text/javascript">
+        try {
+            const config = {
+                // logLevel: 'DEBUG',
+                targetId: 'kaltura_player_541994816',
+                provider: {
+                    partnerId: 2302901,
+                    uiConfId: 50617632
+                },
+                playback: {
+                    autoplay: true,
+                },
+                plugins: {
+                    annoto: {
+                        clientId: 'eyJhbGciOiJIUzI1NiJ9.ZjU4MTMyMzgtZTBiNS00NTM2LWE1ZTEtNTliMGZhMjYzZjVm.3vX2MeaEtjKS83Iqj9K_D-3-NWMXAJUoslpQEuTFVGk',
+                    },
+                    // uiManagers: {},
+                }
+            };
+            const kalturaPlayer = KalturaPlayer.setup(config);
+            kalturaPlayer.loadMedia({ entryId: '1_yhp21rlc' });
+            const annotoService = kalturaPlayer.getService('annoto');
+
+            annotoService.getApi().then((api) => {
+                console.info('api: ', api);
+            });
+            annotoService.onSetup((setupConfig) => {
+                console.info('onSetup: ', setupConfig);
+            });
+        } catch (e) {
+            console.error(e.message)
+        }
+    </script>
+</body>
+
+</html>

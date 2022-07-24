@@ -1,0 +1,30 @@
+.annoto-player-element.nn-side-panel {
+    .playkit-player {
+        transition: width ease-in-out 0.2s;
+        width: calc(100% - var(--nn-side-panel-width));
+        left: 0;
+    }
+    &.nn-side-panel-left {
+        .playkit-player {
+            left: auto;
+            right: 0;
+            float: right;
+        }
+    }
+}
+
+.annoto-player-element {
+    .playkit-annoto-timeline {
+        width: 100%;
+        position: absolute;
+        bottom: calc(100% - 8px);
+    }
+    .playkit-seek-bar {
+        .playkit-frame-preview {
+            bottom: 44px;
+        }
+        .playkit-time-preview {
+            bottom: 50px;
+        }
+    }
+}
