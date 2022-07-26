@@ -34,22 +34,22 @@ jobs:
         role-session-name: deploy-${{ env.REPO_NAME }}-${{ env.APP_VERSION }}-${{ github.actor }}
     - name: Sync to S3 ${{ github.ref_name }}
       run: |
-        aws s3 sync ./dist |
-        "s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/" |
-        --cache-control "public,no-transform,max-age=86400" |
-        --delete |
-        --acl public-read |
+        aws s3 sync ./dist \
+        "s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/" \
+        --cache-control "public,no-transform,max-age=86400" \
+        --delete \
+        --acl public-read \
         --dryrun
     - name: Sync to S3 latest
       run: |
-        aws s3 sync ./dist |
-        "s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/latest/" |
-        --cache-control "public,no-transform,max-age=86400" |
-        --delete |
-        --acl public-read |
+        aws s3 sync ./dist \
+        "s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/latest/" \
+        --cache-control "public,no-transform,max-age=86400" \
+        --delete \
+        --acl public-read \
         --dryrun
     - name: Invalidate Cloudfront
       run: |
-        aws cloudfront create-invalidation |
-        --distribution-id |
+        aws cloudfront create-invalidation \
+        --distribution-id \
         ${{ env.CLOUDFRONT_DIST_ID }} --paths "/${{ env.REPO_NAME }}/latest/*,/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/*"
