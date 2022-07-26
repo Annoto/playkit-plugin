@@ -7,6 +7,7 @@ env:
   BUCKET_NAME : "cdn.annoto.net"
   AWS_REGION : "eu-central-1"
   CLOUDFRONT_DIST_ID: "E2PYBK8LLNZMVK"
+  REPO_NAME: ${{ github.event.repository.name }}
   APP_VERSION: ${{ github.ref_name }}
 jobs:
   deploy:
@@ -30,11 +31,11 @@ jobs:
       with:
         aws-region: ${{ env.AWS_REGION }}
         role-to-assume: arn:aws:iam::281726344480:role/nn-cdn-deploy-playkit-plugin
-        role-session-name: deploy-${{ github.repository }}-${{ env.APP_VERSION }}-${{ github.actor }}
-    - name: Sync to S3 ${{ env.APP_VERSION }}
+        role-session-name: deploy-${{ env.REPO_NAME }}-${{ env.APP_VERSION }}-${{ github.actor }}
+    - name: Sync to S3 ${{ github.ref_name }}
       run: |
         aws s3 sync ./dist |
-        "s3://${{ env.BUCKET_NAME }}/${{ github.repository }}/${{ env.APP_VERSION }}/" |
+        "s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/" |
         --cache-control "public,no-transform,max-age=86400" |
         --delete |
         --acl public-read |
@@ -42,7 +43,7 @@ jobs:
     - name: Sync to S3 latest
       run: |
         aws s3 sync ./dist |
-        "s3://${{ env.BUCKET_NAME }}/${{ github.repository }}/latest/" |
+        "s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/latest/" |
         --cache-control "public,no-transform,max-age=86400" |
         --delete |
         --acl public-read |
@@ -51,4 +52,4 @@ jobs:
       run: |
         aws cloudfront create-invalidation |
         --distribution-id |
-        ${{ env.CLOUDFRONT_DIST_ID }} --paths "/${{ github.repository }}/latest/*,/${{ github.repository }}/${{ env.APP_VERSION }}/*"
+        ${{ env.CLOUDFRONT_DIST_ID }} --paths "/${{ env.REPO_NAME }}/latest/*,/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/*"
