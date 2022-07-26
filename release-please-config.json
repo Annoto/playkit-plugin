@@ -2,7 +2,9 @@
     "release-type": "node",
     "draft": false,
     "prerelease": false,
-    "skip-github-release": false,
+    "skip-github-release": true,
+    "include-v-in-tag": false,
+    "include-component-in-tag": false,
     "packages": {
         ".": {}
     }
