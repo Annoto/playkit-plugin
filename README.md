@@ -45,7 +45,7 @@ To use the plugin, just add plugin bundle script to the page and setup the playe
 ```html
 <script src="https://cdnapisec.kaltura.com/p/2302901/embedPlaykitJs/uiconf_id/50617632"></script>
 <!--Kaltura player-->
-<script src="https://cdn.annoto.net/playking-plugin/latest/plugin.js"></script>
+<script src="https://cdn.annoto.net/playkit-plugin/latest/plugin.js"></script>
 <!--PlayKit Annoto plugin-->
 <div id="kaltura_player_541994816" style="width: 100%; height: 560px;"></div>
 
@@ -81,7 +81,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/Annoto/playkit-plugin/tags).
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [releases on this repository](https://github.com/Annoto/playkit-plugin/releases).
 
 ## License
 
