@@ -1,0 +1,9 @@
+{
+    "release-type": "node",
+    "draft": true,
+    "prerelease": false,
+    "skip-github-release": false,
+    "packages": {
+        ".": {}
+    }
+}
