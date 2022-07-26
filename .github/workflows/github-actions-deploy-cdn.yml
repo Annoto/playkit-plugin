@@ -38,18 +38,16 @@ jobs:
         "s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/" \
         --cache-control "public,no-transform,max-age=86400" \
         --delete \
-        --acl public-read \
-        --dryrun
+        --acl public-read
     - name: Sync to S3 latest
       run: |
         aws s3 sync ./dist \
         "s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/latest/" \
         --cache-control "public,no-transform,max-age=86400" \
         --delete \
-        --acl public-read \
-        --dryrun
+        --acl public-read
     - name: Invalidate Cloudfront
       run: |
         aws cloudfront create-invalidation \
-        --distribution-id \
-        ${{ env.CLOUDFRONT_DIST_ID }} --paths "/${{ env.REPO_NAME }}/latest/*,/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/*"
+        --distribution-id ${{ env.CLOUDFRONT_DIST_ID }} \
+        --paths "/${{ env.REPO_NAME }}/latest/*" "/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/*"
