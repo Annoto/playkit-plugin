@@ -1,0 +1,53 @@
+
+name: Build and Deploy to CDNs
+on:
+  release:
+    types: [published]
+env:
+  BUCKET_NAME : "cdn.annoto.net"
+  AWS_REGION : "eu-central-1"
+  CLOUDFRONT_DIST_ID: "E2PYBK8LLNZMVK"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+    - name: Install Packages
+      run: npm install
+    - name: Build
+      run: npm run build
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        role-to-assume: arn:aws:iam::281726344480:role/nn-cdn-deploy-playkit-plugin
+        role-session-name: deploy-${{ github.repository }}-${{ github.ref }}-${{ github.actor }}
+    - name: Sync to S3 ${{ github.ref }}
+      run: |
+        aws s3 sync ./dist |
+        "s3://${{ env.BUCKET_NAME }}/${{ github.repository }}/${{ github.ref }}/" |
+        --cache-control "public,no-transform,max-age=86400" |
+        --delete |
+        --acl public-read |
+        --dryrun
+    - name: Sync to S3 latest
+      run: |
+        aws s3 sync ./dist |
+        "s3://${{ env.BUCKET_NAME }}/${{ github.repository }}/latest/" |
+        --cache-control "public,no-transform,max-age=86400" |
+        --delete |
+        --acl public-read |
+        --dryrun
+    - name: Invalidate Cloudfront
+      run: |
+        aws cloudfront create-invalidation |
+        --distribution-id |
+        ${{ env.CLOUDFRONT_DIST_ID }} --paths "/${{ github.repository }}/latest/*,/${{ github.repository }}/${{ github.ref }}/*"
