@@ -14,3 +14,5 @@ jobs:
         with:
           command: manifest
           default-branch: main
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          monorepo-tags: false
