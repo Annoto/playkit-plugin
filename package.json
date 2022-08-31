@@ -17,6 +17,7 @@
     "prebuild": "npm run clean",
     "build": "webpack --env envName=prod --progress",
     "dev": "webpack serve --env envName=dev",
+    "dev:proxy": "webpack serve --env envName=dev_proxy",
     "watch": "webpack --progress --color --watch --env envName=dev",
     "eslint": "eslint . --color",
     "prettier:fix": "prettier --write ."
