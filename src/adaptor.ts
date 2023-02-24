@@ -2,6 +2,7 @@ import {
     IMediaDetails,
     IPlayerAdaptorApi,
     PlayerEventCallback,
+    CaptureSeekCallback,
 } from '@annoto/widget-api';
 import {
     IPlaykitPlayer,
@@ -24,6 +25,7 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         event: string;
         fn: PlaykitListenerType;
     }[] = [];
+    private captureSeekDispose: () => void = () => {};
 
     constructor(
         private readonly player: IPlaykitPlayer,
@@ -168,10 +170,33 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         });
     }
 
+    onCaptureSeek(cb: CaptureSeekCallback) {
+        const { element } = this;
+        const mouseDownHandler = (e: Event) => {
+            const { clientX } = e as MouseEvent;
+            const playkitProgress = element?.querySelector('.playkit-progress');
+            const progressRect = playkitProgress?.getBoundingClientRect() || {} as DOMRect;
+            const isRewind = clientX >= progressRect.x && clientX <= (progressRect.x + progressRect.width);
+            cb({ event: e, isRewind });
+        };
+        const keyDownHandler = (e: Event) => { cb({ event: e }); };
+        const seekBarEl = element?.querySelector('.playkit-seek-bar');
+
+        seekBarEl?.addEventListener('mousedown', mouseDownHandler , { capture: true });
+        element?.addEventListener('keydown', keyDownHandler, { capture: true });
+
+        this.captureSeekDispose = () => {
+            seekBarEl?.removeEventListener('mousedown', mouseDownHandler);
+            element?.removeEventListener('keydown', keyDownHandler);
+        };
+    }
+
     private reset() {
         for (const ev of this.events) {
             this.player.removeEventListener(ev.event, ev.fn);
         }
+        this.captureSeekDispose();
+
         this.events = [];
         this.element = undefined;
     }
