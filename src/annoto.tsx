@@ -185,7 +185,10 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
             const appEl = dom.createElement('div');
             dom.setAttribute(appEl, 'id', 'annoto-app');
             dom.appendChild(this.containerEl, appEl);
-            
+            if (this.adaptor.isInIframe()) {
+                const htmlFrameElement = appEl.closest('html')
+                htmlFrameElement.style.overflow = 'hidden';
+            }
             await dom.loadScriptAsync(widgetUrl);
             this.bootstrapDone();
         } catch (err) {
@@ -227,6 +230,19 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
 
         return config;
     }
+    /**
+     * Current kaltura version have bug with overflow,
+     * which leads to bugs on customers side
+     * @private
+     */
+    // private handleIframeOverflow(): void {
+    //     if (this.adaptor.isInIframe()) {
+    //         const htmlFrameElement = $('html').get(0)
+    //         htmlFrameElement.style.overflow = 'hidden';
+    //     }
+    // }
+
+
 
     // for service usage
 

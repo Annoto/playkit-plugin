@@ -168,6 +168,14 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         });
     }
 
+    isInIframe(): boolean {
+        let inIframe = true;
+        try {
+            inIframe = self !== window.parent
+        } catch (e) {}
+        return inIframe;
+    }
+
     private reset() {
         for (const ev of this.events) {
             this.player.removeEventListener(ev.event, ev.fn);
