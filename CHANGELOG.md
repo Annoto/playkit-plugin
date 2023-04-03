@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/Annoto/playkit-plugin/compare/0.1.0...0.1.1) (2023-04-03)
+
+
+### Bug Fixes
+
+* overflow hidden for iframe embed ([79e5bb6](https://github.com/Annoto/playkit-plugin/commit/79e5bb666360e6b4384cc07af4028da7b3c0da57))
+
 ## [0.1.0](https://github.com/Annoto/playkit-plugin/compare/v0.0.1...0.1.0) (2022-07-26)
 
 
