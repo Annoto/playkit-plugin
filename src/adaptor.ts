@@ -25,7 +25,7 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         event: string;
         fn: PlaykitListenerType;
     }[] = [];
-    private captureUIDispose: () => void = () => {};
+    private captureUIDispose: (() => void) | undefined;
 
     constructor(
         private readonly player: IPlaykitPlayer,
@@ -206,7 +206,9 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         for (const ev of this.events) {
             this.player.removeEventListener(ev.event, ev.fn);
         }
-        this.captureUIDispose();
+        if (this.captureUIDispose) {
+            this.captureUIDispose();
+        }
 
         this.events = [];
         this.element = undefined;
