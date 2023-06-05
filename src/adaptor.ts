@@ -2,7 +2,7 @@ import {
     IMediaDetails,
     IPlayerAdaptorApi,
     PlayerEventCallback,
-    CaptureSeekCallback,
+    CaptureUIEventCallback,
 } from '@annoto/widget-api';
 import {
     IPlaykitPlayer,
@@ -25,7 +25,7 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         event: string;
         fn: PlaykitListenerType;
     }[] = [];
-    private captureSeekDispose: () => void = () => {};
+    private captureUIDispose: () => void = () => {};
 
     constructor(
         private readonly player: IPlaykitPlayer,
@@ -43,6 +43,9 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
 
     async remove() {
         this.reset();
+        if (this.captureUIDispose) {
+            this.captureUIDispose();
+        }
         this.logger.debug('remove adaptor');
     }
 
@@ -170,24 +173,32 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         });
     }
 
-    onCaptureSeek(cb: CaptureSeekCallback) {
+    onCaptureUIEvent(cb: CaptureUIEventCallback) {
+        if (this.captureUIDispose) {
+            this.captureUIDispose();
+        }
         const { element } = this;
-        const mouseDownHandler = (e: Event) => {
-            const { clientX } = e as MouseEvent;
-            const playkitProgress = element?.querySelector('.playkit-progress');
-            const progressRect = playkitProgress?.getBoundingClientRect() || {} as DOMRect;
-            const isRewind = clientX >= progressRect.x && clientX <= (progressRect.x + progressRect.width);
-            cb({ event: e, isRewind });
+        const playkitProgress = element?.querySelector('.playkit-progress-bar');
+        if (!element || !playkitProgress) {
+            return;
+        }
+        const mouseDownHandler = (ev: MouseEvent) => {
+            const { clientX } = ev;
+            const rect = playkitProgress.getBoundingClientRect();
+            const timestamp = (clientX - rect.x) / rect.width * this.duration();
+            cb({ ev, timestamp });
         };
-        const keyDownHandler = (e: Event) => { cb({ event: e }); };
-        const seekBarEl = element?.querySelector('.playkit-seek-bar');
+        const keyDownHandler = (ev: KeyboardEvent) => {
+            cb({ ev });
+        };
+        const seekBarEl = element.querySelector('.playkit-seek-bar') as HTMLElement;
 
-        seekBarEl?.addEventListener('mousedown', mouseDownHandler , { capture: true });
-        element?.addEventListener('keydown', keyDownHandler, { capture: true });
+        seekBarEl.addEventListener('mousedown', mouseDownHandler , { capture: true });
+        element.addEventListener('keydown', keyDownHandler, { capture: true });
 
-        this.captureSeekDispose = () => {
-            seekBarEl?.removeEventListener('mousedown', mouseDownHandler);
-            element?.removeEventListener('keydown', keyDownHandler);
+        this.captureUIDispose = () => {
+            seekBarEl.removeEventListener('mousedown', mouseDownHandler);
+            element.removeEventListener('keydown', keyDownHandler);
         };
     }
 
@@ -195,7 +206,7 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         for (const ev of this.events) {
             this.player.removeEventListener(ev.event, ev.fn);
         }
-        this.captureSeekDispose();
+        this.captureUIDispose();
 
         this.events = [];
         this.element = undefined;
