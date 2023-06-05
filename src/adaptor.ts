@@ -178,27 +178,23 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
             this.captureUIDispose();
         }
         const { element } = this;
-        const playkitProgress = element?.querySelector('.playkit-progress-bar');
-        if (!element || !playkitProgress) {
-            return;
-        }
+        const progressBarEl = element?.querySelector('.playkit-progress-bar') as HTMLElement;
         const mouseDownHandler = (ev: MouseEvent) => {
             const { clientX } = ev;
-            const rect = playkitProgress.getBoundingClientRect();
+            const rect = progressBarEl.getBoundingClientRect();
             const timestamp = (clientX - rect.x) / rect.width * this.duration();
             cb({ ev, timestamp });
         };
         const keyDownHandler = (ev: KeyboardEvent) => {
             cb({ ev });
         };
-        const seekBarEl = element.querySelector('.playkit-seek-bar') as HTMLElement;
 
-        seekBarEl.addEventListener('mousedown', mouseDownHandler , { capture: true });
-        element.addEventListener('keydown', keyDownHandler, { capture: true });
+        progressBarEl.addEventListener('mousedown', mouseDownHandler , { capture: true });
+        progressBarEl.addEventListener('keydown', keyDownHandler, { capture: true });
 
         this.captureUIDispose = () => {
-            seekBarEl.removeEventListener('mousedown', mouseDownHandler);
-            element.removeEventListener('keydown', keyDownHandler);
+            progressBarEl.removeEventListener('mousedown', mouseDownHandler);
+            progressBarEl.removeEventListener('keydown', keyDownHandler);
         };
     }
 
