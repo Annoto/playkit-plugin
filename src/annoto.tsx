@@ -7,6 +7,7 @@ import {
 } from '@annoto/widget-api';
 import { BasePlugin } from 'kaltura-player-js';
 import {
+    CustomEventType,
     IAnnotoPlaykitPlugin,
     IAnnotoPlaykitPluginConfig,
     IPlaykitPlayer,
@@ -185,7 +186,7 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
             const appEl = dom.createElement('div');
             dom.setAttribute(appEl, 'id', 'annoto-app');
             dom.appendChild(this.containerEl, appEl);
-            
+
             await dom.loadScriptAsync(widgetUrl);
             this.bootstrapDone();
         } catch (err) {
@@ -208,6 +209,8 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         Annoto.boot(this.widgetConfig);
         this.isWidgetBooted = true;
 
+        this.player.addEventListener(CustomEventType.RESIZE, this.sizeChangeHandle);
+
         Annoto.on('ready' as any, (api: IAnnotoApi) => {
             this.widgetApi = api;
             this.bootDone();
@@ -226,6 +229,31 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         }
 
         return config;
+    }
+
+    private sizeChangeHandle = () => {
+        const htmlEl = document.querySelector('html');
+        if (this.isInIframeEmbed()) {
+            htmlEl!.classList.add('annoto-playkit-plugin-iframe-embed-fix');
+        } else {
+            htmlEl!.classList.remove('annoto-playkit-plugin-iframe-embed-fix');
+        }
+    }
+
+    private isInIframeEmbed(): boolean {
+        let inIframe = true;
+        try {
+            inIframe = self !== window.parent
+        } catch (e) { }
+        if (!inIframe) {
+            return false;
+        }
+        const h = this.player.dimensions.height;
+        if (!h) {
+            return false;
+        }
+        const innerHeight = window.innerHeight;
+        return !!(h >= (innerHeight - 50));
     }
 
     // for service usage

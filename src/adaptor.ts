@@ -148,6 +148,10 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         this.on(Html5EventType.TIME_UPDATE, cb);
     }
 
+    onEnded(cb: PlayerEventCallback): void {
+        this.on(Html5EventType.ENDED, cb);
+    }
+
     onMediaChange(cb: PlayerEventCallback): void {
         this.on(CustomEventType.CHANGE_SOURCE_STARTED, cb);
         // this.on(CustomEventType.CHANGE_SOURCE_ENDED, cb);
