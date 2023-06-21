@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/Annoto/playkit-plugin/compare/0.1.1...0.2.0) (2023-06-21)
+
+
+### Features
+
+* Added end event to adaptor ([#12](https://github.com/Annoto/playkit-plugin/issues/12)) ([b819910](https://github.com/Annoto/playkit-plugin/commit/b819910349ac88ed4d1899ac8038f4226ed0cf39))
+
 ## [0.1.1](https://github.com/Annoto/playkit-plugin/compare/0.1.0...0.1.1) (2023-04-03)
 
 
