@@ -209,7 +209,9 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         Annoto.boot(this.widgetConfig);
         this.isWidgetBooted = true;
 
-        this.player.addEventListener(CustomEventType.RESIZE, this.sizeChangeHandle);
+        this.player.addEventListener(CustomEventType.RESIZE, () => {
+            setTimeout(this.sizeChangeHandle);
+        });
 
         Annoto.on('ready' as any, (api: IAnnotoApi) => {
             this.widgetApi = api;
