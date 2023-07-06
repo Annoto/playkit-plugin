@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/Annoto/playkit-plugin/compare/0.2.0...0.2.1) (2023-07-06)
+
+
+### Bug Fixes
+
+* add setTimeout for resize handler to prevent ResizeObserver errors ([e7df1c9](https://github.com/Annoto/playkit-plugin/commit/e7df1c9d73036853f8126dae43ab0db7cec3726c))
+* max-width style for iframe embeds ([53f3204](https://github.com/Annoto/playkit-plugin/commit/53f320435ef50678e3774633a938922cdebb873d))
+
 ## [0.2.0](https://github.com/Annoto/playkit-plugin/compare/0.1.1...0.2.0) (2023-06-21)
 
 
