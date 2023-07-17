@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/Annoto/playkit-plugin/compare/0.2.1...0.3.0) (2023-07-17)
+
+
+### Features
+
+* implemented optional manul boot ([d0c4551](https://github.com/Annoto/playkit-plugin/commit/d0c4551c96870b7be0e97b0b739ab56a36cc1dd5))
+
 ## [0.2.1](https://github.com/Annoto/playkit-plugin/compare/0.2.0...0.2.1) (2023-07-06)
 
 
