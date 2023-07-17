@@ -48,8 +48,8 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         return true;
     }
 
-    constructor(name: string, player: IPlaykitPlayer, { bootstrapUrl, ...config}: IAnnotoPlaykitPluginConfig) {
-        super(name, player, { bootstrapUrl, ...config });
+    constructor(name: string, player: IPlaykitPlayer, { bootstrapUrl, manualBoot, ...config}: IAnnotoPlaykitPluginConfig) {
+        super(name, player, { bootstrapUrl, manualBoot, ...config });
         this.logger.debug('constructor');
         this.awaitBootstrap = new Promise((resolve) => {
             this.bootstrapDone = resolve;
@@ -83,7 +83,14 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         this.widgetConfig.widgets[0].player = playerConfig;
 
         this.player.registerService('annoto', this.service);
-        this.init();
+
+        this.init().then(() => {
+            if (!manualBoot) {
+                return this.boot();
+            } else {
+                this.logger.info('skip automatic boot');
+            } 
+        }).catch((err) => {});
     }
 
     getName(): string {
@@ -107,6 +114,32 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
 
     destroy(): void {
 
+    }
+
+    async boot(configUpdate?: Partial<IConfig>): Promise<IAnnotoApi> {
+        if (this.isWidgetBooted) {
+            this.logger.warn('already booted');
+            return this.annotoApi;
+        }
+        this.logger.info('boot');
+        try {
+            await this.awaitBootstrap;
+            const playerConfig: IPlayerConfig = {
+                type: 'custom',
+                element: this.containerEl,
+                adaptorApi: this.adaptor,
+            };
+            const baseConfig = KalturaPlayer.core.utils.Object.mergeDeep({}, this.widgetConfig);
+            
+            this.widgetConfig = KalturaPlayer.core.utils.Object.mergeDeep(baseConfig, configUpdate || {});
+            this.widgetConfig.widgets[0].player = playerConfig;
+            this.bootWidget();
+            await this.awaitBoot;
+            return this.widgetApi!;
+        } catch (err) {
+            this.logger.error('widget boot: ', err);
+            throw err;
+        }
     }
 
     loadMedia(): void {
@@ -181,6 +214,7 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
     private async init(): Promise<void> {
         const { config } = this;
         try {
+            this.logger.info('init');
             const widgetUrl = config.bootstrapUrl || BUILD_ENV.widgetUrl;
             const dom = (KalturaPlayer.core.utils as any).Dom;
             const appEl = dom.createElement('div');
@@ -193,12 +227,6 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
             this.logger.error('widget bootstrap: ', err);
             this.bootstrapDone()
             return;
-        }
-
-        try {
-            this.bootWidget();
-        } catch (err) {
-            this.logger.error('widget boot: ', err);
         }
     }
 
