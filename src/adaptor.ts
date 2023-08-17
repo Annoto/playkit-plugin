@@ -45,10 +45,6 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
 
     async remove() {
         this.reset();
-        if (this.captureUIDisposable) {
-            this.captureUIDisposable.dispose();
-            this.captureUIDisposable = undefined;
-        }
         this.logger.debug('remove adaptor');
     }
 
@@ -202,6 +198,10 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         }
         this.events = [];
         this.element = undefined;
+        if (this.captureUIDisposable) {
+            this.captureUIDisposable.dispose();
+            this.captureUIDisposable = undefined;
+        }
     }
 
     private on(event: string, fn: PlaykitListenerType) {
