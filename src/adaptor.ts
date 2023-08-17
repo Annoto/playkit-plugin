@@ -45,6 +45,10 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
 
     async remove() {
         this.reset();
+        if (this.captureUIDisposable) {
+            this.captureUIDisposable.dispose();
+            this.captureUIDisposable = undefined;
+        }
         this.logger.debug('remove adaptor');
     }
 
@@ -176,8 +180,8 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         const { element } = this;
         const progressBarEl = element?.querySelector('.playkit-seek-bar') as HTMLElement;
         this.captureUIDisposable = captureUIEvents({
-            mouseEventsHolderElements: [ progressBarEl ],
-            keyEventsHolderElements: [ element as HTMLElement ],
+            mouseEventsElements: [ progressBarEl ],
+            keyEventsElements: [ element as HTMLElement ],
             mouseEvents: ['mousedown'],
             keyEvents: ['keydown'],
             getDuration: this.duration.bind(this),
