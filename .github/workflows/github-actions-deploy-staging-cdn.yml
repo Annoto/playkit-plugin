@@ -2,7 +2,7 @@
 name: Build and Deploy to CDNs
 on:
   release:
-    types: [released]
+    types: [published]
 env:
   BUCKET_NAME : "cdn.annoto.net"
   AWS_REGION : "eu-central-1"
@@ -12,7 +12,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
+    environment: staging
     permissions:
       id-token: write
       contents: read
@@ -26,24 +26,17 @@ jobs:
     - name: Install Packages
       run: npm ci
     - name: Build
-      run: npm run build
+      run: npm run build:staging
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-region: ${{ env.AWS_REGION }}
         role-to-assume: arn:aws:iam::281726344480:role/nn-cdn-deploy-playkit-plugin
         role-session-name: deploy-${{ env.REPO_NAME }}-${{ env.APP_VERSION }}-${{ github.actor }}
-    - name: Sync to S3 ${{ github.ref_name }}
-      run: |
-        aws s3 sync ./dist \
-        "s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/" \
-        --cache-control "public,no-transform,max-age=86400" \
-        --delete \
-        --acl public-read
     - name: Sync to S3 latest
       run: |
         aws s3 sync ./dist \
-        "s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/latest/" \
+        "s3://${{ env.BUCKET_NAME }}/staging/${{ env.REPO_NAME }}/latest/" \
         --cache-control "public,no-transform,max-age=86400" \
         --delete \
         --acl public-read
@@ -51,4 +44,5 @@ jobs:
       run: |
         aws cloudfront create-invalidation \
         --distribution-id ${{ env.CLOUDFRONT_DIST_ID }} \
-        --paths "/${{ env.REPO_NAME }}/latest/*" "/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/*"
+        --paths "/staging/${{ env.REPO_NAME }}/latest/*" "/${{ env.REPO_NAME }}/${{ env.APP_VERSION }}/*"
+    
