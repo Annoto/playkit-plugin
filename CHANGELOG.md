@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/Annoto/playkit-plugin/compare/0.3.1...0.3.2) (2023-09-04)
+
+
+### Bug Fixes
+
+* aws configure credentials version staging deployment name ([#22](https://github.com/Annoto/playkit-plugin/issues/22)) ([841b2dc](https://github.com/Annoto/playkit-plugin/commit/841b2dc6057e6ebc03ae1042942d93a38b2a1024))
+
 ## [0.3.1](https://github.com/Annoto/playkit-plugin/compare/0.3.0...0.3.1) (2023-09-04)
 
 
