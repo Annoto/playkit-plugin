@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/Annoto/playkit-plugin/compare/0.3.0...0.3.1) (2023-09-04)
+
+
+### Miscellaneous Chores
+
+* release 0.3.1 ([2b68334](https://github.com/Annoto/playkit-plugin/commit/2b68334673b417334055b38024f49172979defa8))
+
 ## [0.3.0](https://github.com/Annoto/playkit-plugin/compare/0.2.1...0.3.0) (2023-07-17)
 
 
