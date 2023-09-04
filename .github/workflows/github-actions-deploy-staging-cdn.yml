@@ -1,5 +1,5 @@
 
-name: Build and Deploy to CDNs
+name: Build and Deploy to Staging CDNs
 on:
   release:
     types: [published]
@@ -28,7 +28,7 @@ jobs:
     - name: Build
       run: npm run build:staging
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v3
       with:
         aws-region: ${{ env.AWS_REGION }}
         role-to-assume: arn:aws:iam::281726344480:role/nn-cdn-deploy-playkit-plugin
