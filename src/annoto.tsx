@@ -236,10 +236,12 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         }
         Annoto.boot(this.widgetConfig);
         this.isWidgetBooted = true;
-
-        this.player.addEventListener(CustomEventType.RESIZE, () => {
-            setTimeout(this.sizeChangeHandle);
-        });
+        const bodyElement = document.querySelector('body');
+        if (bodyElement!.classList.contains('module-browseandembed')) {
+            this.player.addEventListener(CustomEventType.RESIZE, () => {
+                setTimeout(this.sizeChangeHandle);
+            });
+        }
 
         Annoto.on('ready' as any, (api: IAnnotoApi) => {
             this.widgetApi = api;
