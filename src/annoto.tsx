@@ -237,7 +237,11 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         Annoto.boot(this.widgetConfig);
         this.isWidgetBooted = true;
         const bodyElement = document.querySelector('body');
-        if (bodyElement!.classList.contains('module-browseandembed')) {
+        let inIframe = false;
+        try {
+            inIframe = self !== window.parent
+        } catch (e) { }
+        if (bodyElement!.classList.contains('module-browseandembed') && inIframe) {
             this.player.addEventListener(CustomEventType.RESIZE, () => {
                 setTimeout(this.sizeChangeHandle);
             });
@@ -265,21 +269,14 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
 
     private sizeChangeHandle = () => {
         const htmlEl = document.querySelector('html');
-        if (this.isInIframeEmbed()) {
+        if (this.isHeightCanCauseScrollbar()) {
             htmlEl!.classList.add('annoto-playkit-plugin-iframe-embed-fix');
         } else {
             htmlEl!.classList.remove('annoto-playkit-plugin-iframe-embed-fix');
         }
     }
 
-    private isInIframeEmbed(): boolean {
-        let inIframe = true;
-        try {
-            inIframe = self !== window.parent
-        } catch (e) { }
-        if (!inIframe) {
-            return false;
-        }
+    private isHeightCanCauseScrollbar(): boolean {
         const h = this.player.dimensions.height;
         if (!h) {
             return false;
