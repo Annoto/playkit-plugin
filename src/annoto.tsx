@@ -243,7 +243,7 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         } catch (e) { }
         if (bodyElement!.classList.contains('module-browseandembed') && inIframe) {
             this.player.addEventListener(CustomEventType.RESIZE, () => {
-                setTimeout(this.sizeChangeHandle);
+                setTimeout(this.iframeEmbedFixOnsizeChangeHandle);
             });
         }
 
@@ -267,16 +267,16 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         return config;
     }
 
-    private sizeChangeHandle = () => {
+    private iframeEmbedFixOnsizeChangeHandle = () => {
         const htmlEl = document.querySelector('html');
-        if (this.isHeightCanCauseScrollbar()) {
+        if (this.canHeightCauseScrollbar()) {
             htmlEl!.classList.add('annoto-playkit-plugin-iframe-embed-fix');
         } else {
             htmlEl!.classList.remove('annoto-playkit-plugin-iframe-embed-fix');
         }
     }
 
-    private isHeightCanCauseScrollbar(): boolean {
+    private canHeightCauseScrollbar(): boolean {
         const h = this.player.dimensions.height;
         if (!h) {
             return false;
