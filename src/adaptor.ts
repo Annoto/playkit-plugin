@@ -38,7 +38,7 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         this.reset();
         this.element = element;
         this.logger.debug('init adaptor');
-        return true;
+                return true;
     }
 
     async remove() {
@@ -82,6 +82,31 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
             return '';
         }
         return `/partnerId/${player.provider.partnerId || config.session.partnerId}/entryId/${player.sources.id || info!.entryId}`;
+    }
+
+    // https://developer.kaltura.com/player/web/managing-tracks-web
+    captionsOn(language?: string): void {
+        const textTracks =  this.player.getTracks(this.player.Track.TEXT);
+        if (!textTracks?.length) {
+            this.logger.warn('Captions not found');
+            return;
+        }
+        if (language) {
+            for (let i = 0; i < textTracks.length; i++) {
+                if (textTracks[i].language === language) {
+                    this.player.selectTrack(textTracks[i]);
+                    return;
+                }
+            }
+        }
+        for (let i = 0; i < textTracks.length; i++) {
+            // when label is Off, it will disable captions
+            if (textTracks[i].label !== 'Off') {
+                this.logger.warn(`Captions for language ${language} not found, using default`);
+                this.player.selectTrack(textTracks[i]);
+                break;
+            }
+        }
     }
 
     async mediaMetadata(): Promise<IMediaDetails> {
