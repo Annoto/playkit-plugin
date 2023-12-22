@@ -38,7 +38,7 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         this.reset();
         this.element = element;
         this.logger.debug('init adaptor');
-                return true;
+        return true;
     }
 
     async remove() {
