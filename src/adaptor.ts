@@ -94,17 +94,23 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         if (language) {
             for (let i = 0; i < textTracks.length; i++) {
                 if (textTracks[i].language === language) {
+                    this.logger.warn(`Captions for '${language}' enabled`);
                     this.player.selectTrack(textTracks[i]);
                     return;
                 }
             }
         }
         for (let i = 0; i < textTracks.length; i++) {
-            // when label is Off, it will disable captions
+            if (textTracks[i].active && textTracks[i].label !== 'Off') {
+                this.logger.warn('Captions enabled by default for the video');
+                return;
+            }
+        }
+        for (let i = 0; i < textTracks.length; i++) {
             if (textTracks[i].label !== 'Off') {
-                this.logger.warn(`Captions for language ${language} not found, using default`);
+                this.logger.warn(`Captions for language ${language} not found, using auto`);
                 this.player.selectTrack(textTracks[i]);
-                break;
+                return;
             }
         }
     }
