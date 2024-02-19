@@ -3,6 +3,7 @@ import {
     IPlayerAdaptorApi,
     PlayerEventCallback,
     CaptureUIEventCallback,
+    ITextTrack,
 } from '@annoto/widget-api';
 import {
     IPlaykitPlayer,
@@ -85,34 +86,37 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
     }
 
     // https://developer.kaltura.com/player/web/managing-tracks-web
-    captionsOn(language?: string): void {
-        const textTracks =  this.player.getTracks(this.player.Track.TEXT);
-        if (!textTracks?.length) {
-            this.logger.warn('Captions not found');
+    setDefaultTextTrack(defTrack?: ITextTrack): void {
+        const { mode, language } = defTrack || {};
+        if (mode !== 'showing') {
+            return;
+        }
+        const tracks =  this.player.getTracks(this.player.Track.TEXT);
+        if (!tracks?.length) {
+            this.logger.info('Captions tracks not available');
             return;
         }
         if (language) {
-            for (let i = 0; i < textTracks.length; i++) {
-                if (textTracks[i].language === language) {
-                    this.logger.warn(`Captions for '${language}' enabled`);
-                    this.player.selectTrack(textTracks[i]);
+            for (let i = 0; i < tracks.length; i++) {
+                const track = tracks[i];
+                if (
+                    (track.kind === 'captions' || track.kind === 'subtitles') &&
+                    (track.language || '').toLowerCase().includes(language.toLowerCase())
+                ) {
+                    this.player.selectTrack(tracks[i]);
                     return;
                 }
             }
         }
-        for (let i = 0; i < textTracks.length; i++) {
-            if (textTracks[i].active && textTracks[i].label !== 'Off') {
-                this.logger.warn('Captions enabled by default for the video');
+        for (let i = 0; i < tracks.length; i++) {
+            const track = tracks[i];
+            if ((track.kind === 'captions' || track.kind === 'subtitles') && track.language !== 'off') {
+                this.player.selectTrack(track);
+                this.logger.info(`Captions for language ${language} not found, fall back to ${track.language}`);;
                 return;
             }
         }
-        for (let i = 0; i < textTracks.length; i++) {
-            if (textTracks[i].label !== 'Off') {
-                this.logger.warn(`Captions for language ${language} not found, using auto`);
-                this.player.selectTrack(textTracks[i]);
-                return;
-            }
-        }
+        this.logger.info('Captions tracks not available')
     }
 
     async mediaMetadata(): Promise<IMediaDetails> {
