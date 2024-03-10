@@ -1,6 +1,6 @@
 {
   "name": "@annoto/playkit-plugin",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Annoto Plugin for Kaltura Playkit (V7)",
   "license": "Apache-2.0",
   "author": "Genadi Sokolov [genadi@annoto.net]",
