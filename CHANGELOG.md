@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.4](https://github.com/Annoto/playkit-plugin/compare/0.3.3...0.3.4) (2024-03-10)
+
+
+### Bug Fixes
+
+* set playkit container overflow to not cut the widget ([6c72b81](https://github.com/Annoto/playkit-plugin/commit/6c72b81778666070c5dc3e38d91f94320067d8ff))
+
 ## [0.3.3](https://github.com/Annoto/playkit-plugin/compare/0.3.2...0.3.3) (2023-11-12)
 
 
