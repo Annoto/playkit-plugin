@@ -236,10 +236,16 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         }
         Annoto.boot(this.widgetConfig);
         this.isWidgetBooted = true;
-
-        this.player.addEventListener(CustomEventType.RESIZE, () => {
-            setTimeout(this.sizeChangeHandle);
-        });
+        const bodyElement = document.querySelector('body');
+        let inIframe = false;
+        try {
+            inIframe = self !== window.parent
+        } catch (e) { }
+        if (bodyElement!.classList.contains('module-browseandembed') && inIframe) {
+            this.player.addEventListener(CustomEventType.RESIZE, () => {
+                setTimeout(this.iframeEmbedFixOnsizeChangeHandle);
+            });
+        }
 
         Annoto.on('ready' as any, (api: IAnnotoApi) => {
             this.widgetApi = api;
@@ -261,23 +267,16 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         return config;
     }
 
-    private sizeChangeHandle = () => {
+    private iframeEmbedFixOnsizeChangeHandle = () => {
         const htmlEl = document.querySelector('html');
-        if (this.isInIframeEmbed()) {
+        if (this.canHeightCauseScrollbar()) {
             htmlEl!.classList.add('annoto-playkit-plugin-iframe-embed-fix');
         } else {
             htmlEl!.classList.remove('annoto-playkit-plugin-iframe-embed-fix');
         }
     }
 
-    private isInIframeEmbed(): boolean {
-        let inIframe = true;
-        try {
-            inIframe = self !== window.parent
-        } catch (e) { }
-        if (!inIframe) {
-            return false;
-        }
+    private canHeightCauseScrollbar(): boolean {
         const h = this.player.dimensions.height;
         if (!h) {
             return false;
