@@ -29,6 +29,10 @@
     }
 }
 
+.playkit-floating-container.playkit-floating-container {
+    overflow: visible;
+}
+
 .annoto-playkit-plugin-iframe-embed-fix,
 .annoto-playkit-plugin-iframe-embed-fix body {
     overflow: hidden;
