@@ -160,7 +160,7 @@ export interface IPlaykitPlayer extends IFakeEventTarget, Omit<KalturaPlayerType
     /**
      * @param track The track to select from getTracks()
      */
-    selectTrack(track: any): void;
+    selectTrack(track: unknown): void;
 
     readonly uiComponents: IPlaykitUiComponent[];
     /**

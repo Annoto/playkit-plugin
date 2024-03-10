@@ -91,32 +91,21 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         if (mode !== 'showing') {
             return;
         }
-        const tracks =  this.player.getTracks(this.player.Track.TEXT);
+        const tracks: TextTrack[] =  this.player.getTracks(this.player.Track.TEXT)
+            ?.filter(t => t.kind === 'captions' || t.kind === 'subtitles');
         if (!tracks?.length) {
-            this.logger.info('Captions tracks not available');
+            this.logger.info('setDefaultTextTrack - Captions tracks not available');
             return;
         }
+        let selectedTrack: TextTrack | undefined;
         if (language) {
-            for (let i = 0; i < tracks.length; i++) {
-                const track = tracks[i];
-                if (
-                    (track.kind === 'captions' || track.kind === 'subtitles') &&
-                    (track.language || '').toLowerCase().includes(language.toLowerCase())
-                ) {
-                    this.player.selectTrack(tracks[i]);
-                    return;
-                }
-            }
+            selectedTrack = tracks.find(t => (t.language || '').toLowerCase() === language.toLowerCase());
+            this.logger.info(`setDefaultTextTrack - Captions for language ${language} not found, fall back to default`);
         }
-        for (let i = 0; i < tracks.length; i++) {
-            const track = tracks[i];
-            if ((track.kind === 'captions' || track.kind === 'subtitles') && track.language !== 'off') {
-                this.player.selectTrack(track);
-                this.logger.info(`Captions for language ${language} not found, fall back to ${track.language}`);;
-                return;
-            }
+        if (!selectedTrack) {
+            selectedTrack = tracks.find(t => t.language !== 'off' && (t as any).default) || tracks.find(t => t.language !== 'off');
         }
-        this.logger.info('Captions tracks not available')
+        this.player.selectTrack(selectedTrack!);
     }
 
     async mediaMetadata(): Promise<IMediaDetails> {
