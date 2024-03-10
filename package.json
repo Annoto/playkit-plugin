@@ -24,7 +24,7 @@
     "prettier:fix": "prettier --write ."
   },
   "devDependencies": {
-    "@annoto/widget-api": "^3.28.0",
+    "@annoto/widget-api": "^3.37.0",
     "@types/webpack": "^5.28.0",
     "@typescript-eslint/eslint-plugin": "^5.23.0",
     "@typescript-eslint/parser": "^5.23.0",
