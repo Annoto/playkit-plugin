@@ -157,6 +157,10 @@ export interface IPlaykitPlayer extends IFakeEventTarget, Omit<KalturaPlayerType
     loadMedia(mediaInfo: IProviderMediaInfoObject, mediaOptions?: KalturaPlayerTypes.Sources): Promise<void>;
     getMediaInfo(): IProviderMediaInfoObject | undefined;
     getMediaConfig(): IProviderMediaConfigObject | undefined;
+    /**
+     * @param track The track to select from getTracks()
+     */
+    selectTrack(track: unknown): void;
 
     readonly uiComponents: IPlaykitUiComponent[];
     /**

@@ -3,6 +3,7 @@ import {
     IPlayerAdaptorApi,
     PlayerEventCallback,
     CaptureUIEventCallback,
+    ITextTrack,
 } from '@annoto/widget-api';
 import {
     IPlaykitPlayer,
@@ -82,6 +83,29 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
             return '';
         }
         return `/partnerId/${player.provider.partnerId || config.session.partnerId}/entryId/${player.sources.id || info!.entryId}`;
+    }
+
+    // https://developer.kaltura.com/player/web/managing-tracks-web
+    setDefaultTextTrack(defTrack?: ITextTrack): void {
+        const { mode, language } = defTrack || {};
+        if (mode !== 'showing') {
+            return;
+        }
+        const tracks: TextTrack[] =  this.player.getTracks(this.player.Track.TEXT)
+            ?.filter(t => t.kind === 'captions' || t.kind === 'subtitles');
+        if (!tracks?.length) {
+            this.logger.info('setDefaultTextTrack - Captions tracks not available');
+            return;
+        }
+        let selectedTrack: TextTrack | undefined;
+        if (language) {
+            selectedTrack = tracks.find(t => (t.language || '').toLowerCase() === language.toLowerCase());
+            this.logger.info(`setDefaultTextTrack - Captions for language ${language} not found, fall back to default`);
+        }
+        if (!selectedTrack) {
+            selectedTrack = tracks.find(t => t.language !== 'off' && (t as any).default) || tracks.find(t => t.language !== 'off');
+        }
+        this.player.selectTrack(selectedTrack!);
     }
 
     async mediaMetadata(): Promise<IMediaDetails> {
