@@ -29,12 +29,38 @@
     }
 }
 
-.playkit-floating-container.playkit-floating-container {
-    overflow: visible;
+.nnk-widget.nnk-setup.player-v7 {
+    #mediaContainer {
+        #wrapper.video {
+            overflow: visible;
+            .playkit-floating-container {
+                overflow: visible;
+            }
+        }
+    }
+}
+
+.playkit-floating-container {
+    &.playkit-floating-active {
+        .kaltura-player-container:not(:fullscreen) {
+            nn-widget-overlay {
+                .annoto-resizable {
+                    visibility: hidden;
+                }
+            }
+        }
+    }
 }
 
 .annoto-playkit-plugin-iframe-embed-fix,
 .annoto-playkit-plugin-iframe-embed-fix body {
     overflow: hidden;
     max-width: none;
+    #mediaContainer {
+        #wrapper.video {
+            padding: 0 !important;
+            position: static !important;
+            height: auto !important;
+        }
+    }
 }
