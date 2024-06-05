@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/Annoto/playkit-plugin/compare/0.4.0...0.4.1) (2024-06-05)
+
+
+### Bug Fixes
+
+* iframe embed flicker fix, overflow on kms and hide widget on player float ([08a3f21](https://github.com/Annoto/playkit-plugin/commit/08a3f210415b61fb6282f3bd868b12d1c1b5f104))
+
 ## [0.4.0](https://github.com/Annoto/playkit-plugin/compare/0.3.3...0.4.0) (2024-03-10)
 
 
