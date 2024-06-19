@@ -1,14 +1,29 @@
 .annoto-player-element.nn-side-panel {
-    .playkit-player {
+     .playkit-player {
         transition: width ease-in-out 0.2s;
         width: calc(100% - var(--nn-side-panel-width));
         left: 0;
     }
     &.nn-side-panel-left {
-        .playkit-player {
+     .playkit-player {
             left: auto;
             right: 0;
             float: right;
+        }
+    }
+    &.nn-player-side-panel-right,
+    &.nn-player-side-panel-left {
+        .playkit-video-player > .playkit-container {
+            transition: width ease-in-out 0.2s;
+            width: calc(100% - var(--nn-side-panel-width));
+            left: 0;
+        }
+        &.nn-side-panel-left {
+            .playkit-video-player > .playkit-container {
+                left: auto;
+                right: 0;
+                float: right;
+            }
         }
     }
 }

@@ -5,18 +5,19 @@ import {
     IPlayerConfig,
     IWidgetConfig,
 } from '@annoto/widget-api';
-import { BasePlugin } from 'kaltura-player-js';
 import {
     CustomEventType,
     IAnnotoPlaykitPlugin,
     IAnnotoPlaykitPluginConfig,
     IPlaykitPlayer,
+    IPlaykitSidePanelsManager,
     PlaykitRemoveComponentHandlerType,
 } from './interfaces';
 import { BUILD_ENV } from './constants';
 import { AnnotoTimelineComponent } from './components';
 import { PlaykitPlayerAdaptor } from './adaptor';
 import { PlaykitAnnotoService } from './annoto.service';
+import { throttle } from './util';
 
 import './style.scss';
 
@@ -24,7 +25,7 @@ const h = (KalturaPlayer.ui as any).h;
 
 declare const Annoto: AnnotoMain;
 
-export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoPlaykitPlugin {
+export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin implements IAnnotoPlaykitPlugin {
     readonly config!: IAnnotoPlaykitPluginConfig;
     readonly player!: IPlaykitPlayer;
     readonly logger!: KalturaPlayerTypes.Logger;
@@ -197,9 +198,11 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
         // this.showSidePanel();
     }
 
-    /* private get sidePanelsManager(): IPlaykitSidePanelsManager {
+    private get sidePanelsManager(): IPlaykitSidePanelsManager {
         return this.player.getService('sidePanelsManager') as IPlaykitSidePanelsManager;
     }
+
+    /*
     private showSidePanel(): void {
         // this.sidePanelsManager.activateItem(this.sidePanelItemId!);
 
@@ -251,7 +254,43 @@ export class PlaykitAnnotoPlugin extends (BasePlugin as any) implements IAnnotoP
             this.widgetApi = api;
             this.bootDone();
         });
+
+        /* Annoto.on('ux', (ev: IUxEvent) => {
+            if (ev.name === 'widget:show' || ev.name === 'widget:hide' || ev.name === 'widget:minimise') {
+                this.handleWidgetTransition();
+            }
+        }); */
+        this.player.addEventListener(CustomEventType.RESIZE, throttle(() => {
+            const { left, right } = this.sidePanelsManager?.activePanels || {};
+            this.containerEl.classList.toggle('nn-player-side-panel-left', !!left);
+            this.containerEl.classList.toggle('nn-player-side-panel-right', !!right);
+        }, 200, { debounceLast: true }));
     }
+
+    /* private handleWidgetTransition() {
+        const playerContainer = this.getPlayerContainer();
+        if (!playerContainer) {
+            return;
+        }
+        this.dispatchUIStateChange(playerContainer);
+        const timeline: number[] = [30, 60, 80, 100, 120, 150, 170, 200, 250, 300, 400];
+        timeline.forEach((time) => setTimeout(this.dispatchUIStateChange, time, playerContainer));
+    }
+
+    private dispatchUIStateChange = (playerContainer: HTMLElement): void => {
+        // https://github.com/kaltura/playkit-js-ui/blob/master/src/reducers/shell.ts#L276
+        // https://github.com/kaltura/playkit-js-ui/blob/master/src/components/shell/shell.tsx#L212
+        // https://github.com/kaltura/playkit-js-ui/blob/master/src/components/player-area/styles-store-adapter.tsx#L83
+        const rect = playerContainer.getBoundingClientRect();
+        const { store } = this.player.ui;
+        const { actions } = KalturaPlayer.ui.reducers.shell;
+        store.dispatch(actions.updateDocumentWidth(document.body.clientWidth));
+        store.dispatch(actions.updatePlayerClientRect(rect));
+    };
+
+    private getPlayerContainer(): HTMLElement | null {
+        return this.player.getView().closest('.kaltura-player-container');
+    } */
 
     private setupHookHandle = async ({ config }: { widgetIndex: number; config: IConfig; mediaSrc: string; }): Promise<IConfig> => {
         const { player } = this;
