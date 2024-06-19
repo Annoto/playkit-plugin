@@ -462,6 +462,13 @@ export interface IPlaykitSidePanelsSize {
  * https://github.com/kaltura/playkit-js-ui-managers
  */
 export interface IPlaykitSidePanelsManager {
+    // https://github.com/kaltura/playkit-js-ui-managers/blob/master/src/services/side-panels-manager/side-panels-manager.ts#L15
+    readonly activePanels?: {
+        bottom: null | unknown;
+        left: null | unknown;
+        right: null | unknown;
+        top: null | unknown;
+    };
     addItem(item: IPlaykitSidePanelItem): number;
     removeItem(itemId: number): void;
     activateItem(itemId: number): void;
@@ -485,3 +492,18 @@ export interface IPlaykitPanelComponentProps {
 }
 
 export interface IPlaykitIconComponentProps extends IPlaykitPanelComponentProps { }
+
+export interface IPlaykitState {
+    shell: IPlaykitShellState;
+}
+
+export interface IPlaykitShellState {
+    sidePanelsModes: {
+        bottom: PlaykitSidePanelMode;
+        left: PlaykitSidePanelMode;
+        right: PlaykitSidePanelMode;
+        top: PlaykitSidePanelMode;
+    };
+}
+
+export type PlaykitSidePanelMode = PlaykitUI.SidePanelMode;
