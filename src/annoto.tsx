@@ -11,6 +11,7 @@ import {
     IAnnotoPlaykitPluginConfig,
     IPlaykitPlayer,
     IPlaykitSidePanelsManager,
+    IPlaykitState,
     PlaykitRemoveComponentHandlerType,
 } from './interfaces';
 import { BUILD_ENV } from './constants';
@@ -260,12 +261,17 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
                 this.handleWidgetTransition();
             }
         }); */
-        this.player.addEventListener(CustomEventType.RESIZE, throttle(() => {
-            const { left, right } = this.sidePanelsManager?.activePanels || {};
-            this.containerEl.classList.toggle('nn-player-side-panel-left', !!left);
-            this.containerEl.classList.toggle('nn-player-side-panel-right', !!right);
-        }, 200, { debounceLast: true }));
+        this.player.addEventListener(CustomEventType.RESIZE, this.updateSidePanelClasses);
+        // this.player.ui.store.subscribe(this.updateSidePanelClasses);
     }
+
+    private updateSidePanelClasses = throttle(() => {
+        const { left, right } = this.sidePanelsManager?.activePanels || {};
+        const { shell } = this.player.ui.store.getState() as IPlaykitState || {};
+        const { sidePanelsModes } = shell || {};
+        this.containerEl.classList.toggle('nn-player-side-panel-left', !!left && sidePanelsModes?.left === 'alongside');
+        this.containerEl.classList.toggle('nn-player-side-panel-right', !!right && sidePanelsModes?.right === 'alongside');
+    }, 200, { debounceLast: true });
 
     /* private handleWidgetTransition() {
         const playerContainer = this.getPlayerContainer();

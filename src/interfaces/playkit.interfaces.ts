@@ -492,3 +492,18 @@ export interface IPlaykitPanelComponentProps {
 }
 
 export interface IPlaykitIconComponentProps extends IPlaykitPanelComponentProps { }
+
+export interface IPlaykitState {
+    shell: IPlaykitShellState;
+}
+
+export interface IPlaykitShellState {
+    sidePanelsModes: {
+        bottom: PlaykitSidePanelMode;
+        left: PlaykitSidePanelMode;
+        right: PlaykitSidePanelMode;
+        top: PlaykitSidePanelMode;
+    };
+}
+
+export type PlaykitSidePanelMode = PlaykitUI.SidePanelMode;
