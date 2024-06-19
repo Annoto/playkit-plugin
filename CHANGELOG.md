@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/Annoto/playkit-plugin/compare/0.4.1...0.4.2) (2024-06-19)
+
+
+### Bug Fixes
+
+* player layout with sidepanels including playlist ([#31](https://github.com/Annoto/playkit-plugin/issues/31)) ([408950a](https://github.com/Annoto/playkit-plugin/commit/408950a6a0f5fea05d301402e3bf190cdad3ab27))
+
 ## [0.4.1](https://github.com/Annoto/playkit-plugin/compare/0.4.0...0.4.1) (2024-06-05)
 
 
