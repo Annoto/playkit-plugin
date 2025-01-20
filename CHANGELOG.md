@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/Annoto/playkit-plugin/compare/0.4.2...0.4.3) (2025-01-20)
+
+
+### Bug Fixes
+
+* widget config deep merge ([#33](https://github.com/Annoto/playkit-plugin/issues/33)) ([103a1fa](https://github.com/Annoto/playkit-plugin/commit/103a1fadcd230012728bdfec2cd67a8c71242aa0))
+
 ## [0.4.2](https://github.com/Annoto/playkit-plugin/compare/0.4.1...0.4.2) (2024-06-19)
 
 
