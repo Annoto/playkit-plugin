@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.4](https://github.com/Annoto/playkit-plugin/compare/0.4.3...0.4.4) (2025-01-20)
+
+
+### Bug Fixes
+
+* github deploy actions ([#35](https://github.com/Annoto/playkit-plugin/issues/35)) ([cb5c05a](https://github.com/Annoto/playkit-plugin/commit/cb5c05a7fe3bd5589518a16b5b181fe9751f4d13))
+
 ## [0.4.3](https://github.com/Annoto/playkit-plugin/compare/0.4.2...0.4.3) (2025-01-20)
 
 
