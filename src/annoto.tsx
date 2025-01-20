@@ -62,27 +62,8 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         this.containerEl = player.getView().closest('.kaltura-player-container')!;
         this.adaptor = new PlaykitPlayerAdaptor(player, this);
         this.service = new PlaykitAnnotoService(this);
-
-        const playerConfig: IPlayerConfig = {
-            type: 'custom',
-            element: this.containerEl,
-            adaptorApi: this.adaptor,
-        };
-        const baseWidgetConfig: Partial<IWidgetConfig> = {
-            timeline: {
-                overlay: true,
-            },
-            features: {},
-        };
-        const baseConfig: IConfig = {
-            widgets: [baseWidgetConfig as IWidgetConfig],
-            hooks: {
-                setup: this.setupHookHandle,
-            }
-        };
         
-        this.widgetConfig = KalturaPlayer.core.utils.Object.mergeDeep({}, config || {}, baseConfig);
-        this.widgetConfig.widgets[0].player = playerConfig;
+        this.widgetConfig = this.mergeConfigUpdate(config);
 
         this.player.registerService('annoto', this.service);
 
@@ -126,15 +107,8 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         this.logger.info('boot');
         try {
             await this.awaitBootstrap;
-            const playerConfig: IPlayerConfig = {
-                type: 'custom',
-                element: this.containerEl,
-                adaptorApi: this.adaptor,
-            };
-            const baseConfig = KalturaPlayer.core.utils.Object.mergeDeep({}, this.widgetConfig);
             
-            this.widgetConfig = KalturaPlayer.core.utils.Object.mergeDeep(baseConfig, configUpdate || {});
-            this.widgetConfig.widgets[0].player = playerConfig;
+            this.widgetConfig = this.mergeConfigUpdate(configUpdate);
             this.bootWidget();
             await this.awaitBoot;
             return this.widgetApi!;
@@ -232,6 +206,34 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
             this.bootstrapDone()
             return;
         }
+    }
+
+    private mergeConfigUpdate(update?: Partial<IConfig>): IConfig {
+        const updateConfig: Partial<IConfig> = { ...update };
+        const updateWConfig: Partial<IWidgetConfig> = { ...updateConfig.widgets?.[0] };
+        // update all, keep setup hook, widget timeline overlay and player. make sure widget features is not undefined
+        return {
+            ...updateConfig,
+            hooks: {
+                ...updateConfig.hooks,
+                setup: this.setupHookHandle,
+            },
+            widgets: [
+                {
+                    ...updateWConfig,
+                    features: { ...updateWConfig.features },
+                    timeline: {
+                        ...updateWConfig.timeline,
+                        overlay: true,
+                    },
+                    player: {
+                        type: 'custom',
+                        element: this.containerEl,
+                        adaptorApi: this.adaptor,
+                    },
+                },
+            ],
+        };
     }
 
     private async bootWidget() {
