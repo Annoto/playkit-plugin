@@ -209,31 +209,42 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
     }
 
     private mergeConfigUpdate(update?: Partial<IConfig>): IConfig {
+        const baseConfig: Partial<IConfig> = KalturaPlayer.core.utils.Object.mergeDeep({}, this.widgetConfig || {});
+        const baseWConfig: Partial<IWidgetConfig> = { ...baseConfig.widgets?.[0] };
         const updateConfig: Partial<IConfig> = { ...update };
         const updateWConfig: Partial<IWidgetConfig> = { ...updateConfig.widgets?.[0] };
         // update all, keep setup hook, widget timeline overlay and player. make sure widget features is not undefined
-        return {
+        // KalturaPlayer.core.utils.Object.mergeDeep() does not merge arrays, so we make sure to merge widgets manually
+        return KalturaPlayer.core.utils.Object.mergeDeep(baseConfig, {
+            ...baseConfig,
             ...updateConfig,
             hooks: {
+                ...baseConfig.hooks,
                 ...updateConfig.hooks,
                 setup: this.setupHookHandle,
             },
             widgets: [
-                {
+                KalturaPlayer.core.utils.Object.mergeDeep(baseWConfig, {
                     ...updateWConfig,
-                    features: { ...updateWConfig.features },
+                    features: {
+                        ...baseWConfig.features,
+                        ...updateWConfig.features,
+                    },
                     timeline: {
+                        ...baseWConfig.timeline,
                         ...updateWConfig.timeline,
                         overlay: true,
                     },
                     player: {
+                        ...baseWConfig.player,
+                        ...updateWConfig.player,
                         type: 'custom',
                         element: this.containerEl,
                         adaptorApi: this.adaptor,
                     },
-                },
+                }),
             ],
-        };
+        });
     }
 
     private async bootWidget() {
