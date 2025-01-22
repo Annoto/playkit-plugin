@@ -216,27 +216,20 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         // update all, keep setup hook, widget timeline overlay and player. make sure widget features is not undefined
         // KalturaPlayer.core.utils.Object.mergeDeep() does not merge arrays, so we make sure to merge widgets manually
         return KalturaPlayer.core.utils.Object.mergeDeep(baseConfig, {
-            ...baseConfig,
             ...updateConfig,
             hooks: {
-                ...baseConfig.hooks,
                 ...updateConfig.hooks,
                 setup: this.setupHookHandle,
             },
             widgets: [
                 KalturaPlayer.core.utils.Object.mergeDeep(baseWConfig, {
                     ...updateWConfig,
-                    features: {
-                        ...baseWConfig.features,
-                        ...updateWConfig.features,
-                    },
+                    features: { ...updateWConfig.features },
                     timeline: {
-                        ...baseWConfig.timeline,
                         ...updateWConfig.timeline,
                         overlay: true,
                     },
                     player: {
-                        ...baseWConfig.player,
                         ...updateWConfig.player,
                         type: 'custom',
                         element: this.containerEl,
