@@ -6,23 +6,9 @@
 ### Bug Fixes
 
 * github deploy actions ([#35](https://github.com/Annoto/playkit-plugin/issues/35)) ([cb5c05a](https://github.com/Annoto/playkit-plugin/commit/cb5c05a7fe3bd5589518a16b5b181fe9751f4d13))
-* manualy revert version to 0.4.2 ([32f6a27](https://github.com/Annoto/playkit-plugin/commit/32f6a27feea7002a09ca13fd4db0149bb14527f3))
 * widget config deep merge ([#33](https://github.com/Annoto/playkit-plugin/issues/33)) ([103a1fa](https://github.com/Annoto/playkit-plugin/commit/103a1fadcd230012728bdfec2cd67a8c71242aa0))
 * widget config deep merge ([#37](https://github.com/Annoto/playkit-plugin/issues/37)) ([cd0799a](https://github.com/Annoto/playkit-plugin/commit/cd0799aea2223c412a9b8de71da4eb7d4c78fc26))
 
-## [0.4.4](https://github.com/Annoto/playkit-plugin/compare/0.4.3...0.4.4) (2025-01-20)
-
-
-### Bug Fixes
-
-* github deploy actions ([#35](https://github.com/Annoto/playkit-plugin/issues/35)) ([cb5c05a](https://github.com/Annoto/playkit-plugin/commit/cb5c05a7fe3bd5589518a16b5b181fe9751f4d13))
-
-## [0.4.3](https://github.com/Annoto/playkit-plugin/compare/0.4.2...0.4.3) (2025-01-20)
-
-
-### Bug Fixes
-
-* widget config deep merge ([#33](https://github.com/Annoto/playkit-plugin/issues/33)) ([103a1fa](https://github.com/Annoto/playkit-plugin/commit/103a1fadcd230012728bdfec2cd67a8c71242aa0))
 
 ## [0.4.2](https://github.com/Annoto/playkit-plugin/compare/0.4.1...0.4.2) (2024-06-19)
 
