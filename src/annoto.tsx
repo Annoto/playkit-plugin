@@ -2,7 +2,6 @@ import {
     IConfig,
     IAnnotoApi,
     Annoto as AnnotoMain,
-    IPlayerConfig,
     IWidgetConfig,
 } from '@annoto/widget-api';
 import {
@@ -27,6 +26,7 @@ const h = (KalturaPlayer.ui as any).h;
 declare const Annoto: AnnotoMain;
 
 export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin implements IAnnotoPlaykitPlugin {
+    static AUTO_BOOT = false;
     readonly config!: IAnnotoPlaykitPluginConfig;
     readonly player!: IPlaykitPlayer;
     readonly logger!: KalturaPlayerTypes.Logger;
@@ -68,7 +68,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         this.player.registerService('annoto', this.service);
 
         this.init().then(() => {
-            if (manualBoot === false) {
+            if (manualBoot === false || (PlaykitAnnotoPlugin.AUTO_BOOT === true && manualBoot !== true)) {
                 return this.boot();
             } else {
                 this.logger.info('skip automatic boot');

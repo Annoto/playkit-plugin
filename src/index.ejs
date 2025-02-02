@@ -8,12 +8,17 @@
     <title>
         <%- htmlWebpackPlugin.options.title %>
     </title>
+    <style>
+        .kaltura-player .playkit-floating-container {
+            overflow: visible;
+        }
+    </style>
 </head>
 
 <body>
     <h3>Annoto Kaltura Playkit Plugin</h3>
 
-    <div id="kaltura_player_541994816" style="width: calc(100% - 350px); height: 560px;"></div>
+    <div class="kaltura-player" id="kaltura_player_541994816" style="width: calc(100% - 350px); height: 560px;"></div>
     <script src="https://cdnapisec.kaltura.com/p/2302901/embedPlaykitJs/uiconf_id/50617632"></script>
     <!-- <script src="https://raw.githack.com/kaltura/playkit-js-ui-managers/master/dist/playkit-ui-managers.js"></script> -->
     
@@ -42,7 +47,7 @@
             const kalturaPlayer = KalturaPlayer.setup(config);
             kalturaPlayer.loadMedia({ entryId: '1_lnx34lum' });
             const annotoService = kalturaPlayer.getService('annoto');
-
+            annotoService.boot();
             annotoService.getApi().then((api) => {
                 console.info('api: ', api);
             });
