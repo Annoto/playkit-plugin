@@ -12,9 +12,8 @@ export interface IAnnotoPlaykitPluginConfig extends Partial<IConfig> {
      */
     bootstrapUrl?: string;
     /**
-     * if set to true, boot widget manually using the PlaykitAnnotoService.boot() method
-     * by default widget boot is done automatically imideatly after plugin script is loaded
-     * @default false
+     * if set to false, boot widget automatically with the configuration provided to the plugin via the player configuration
+     * @default true
      */
     manualBoot?: boolean;
 }

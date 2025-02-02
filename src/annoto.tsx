@@ -68,7 +68,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         this.player.registerService('annoto', this.service);
 
         this.init().then(() => {
-            if (!manualBoot) {
+            if (manualBoot === false) {
                 return this.boot();
             } else {
                 this.logger.info('skip automatic boot');
