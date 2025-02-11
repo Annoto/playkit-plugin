@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/Annoto/playkit-plugin/compare/1.0.0...1.1.0) (2025-02-11)
+
+
+### Features
+
+* added annoto plugin setup events dispatch ([#42](https://github.com/Annoto/playkit-plugin/issues/42)) ([15bcf5d](https://github.com/Annoto/playkit-plugin/commit/15bcf5d8223f5a05e2935144a76a51147f2f1e78))
+
 ## [1.0.0](https://github.com/Annoto/playkit-plugin/compare/0.4.3...1.0.0) (2025-02-11)
 
 
