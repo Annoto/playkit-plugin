@@ -45,6 +45,15 @@
                 }
             };
             const kalturaPlayer = KalturaPlayer.setup(config);
+            kalturaPlayer.addEventListener('annotoserviceready', () => {
+                console.info('annoto plugin service ready');
+            });
+            kalturaPlayer.addEventListener('annotoinitdone', () => {
+                console.info('annoto plugin initialized');
+            });
+            kalturaPlayer.addEventListener('annotowidgetboot', () => {
+                console.info('annoto widget boot');
+            });
             kalturaPlayer.loadMedia({ entryId: '1_lnx34lum' });
             const annotoService = kalturaPlayer.getService('annoto');
             annotoService.boot();

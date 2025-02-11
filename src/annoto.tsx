@@ -6,6 +6,7 @@ import {
 } from '@annoto/widget-api';
 import {
     CustomEventType,
+    AnnotoPluginEventType,
     IAnnotoPlaykitPlugin,
     IAnnotoPlaykitPluginConfig,
     IPlaykitPlayer,
@@ -66,8 +67,10 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         this.widgetConfig = this.mergeConfigUpdate(config);
 
         this.player.registerService('annoto', this.service);
+        this.dispatchEvent(AnnotoPluginEventType.ANNOTO_SERVICE_READY);
 
         this.init().then(() => {
+            this.dispatchEvent(AnnotoPluginEventType.ANNOTO_INIT_DONE);
             if (manualBoot === false || (PlaykitAnnotoPlugin.AUTO_BOOT === true && manualBoot !== true)) {
                 return this.boot();
             } else {
@@ -80,7 +83,9 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         return super.getName();
     }
     dispatchEvent(name: string, payload?: any): void {
-        return super.dispatchEvent(name, payload);
+        try {
+            super.dispatchEvent(name, payload);
+        } catch (err) {}
     }
     updateConfig({ bootstrapUrl, clientId, ...update }: Partial<IAnnotoPlaykitPluginConfig>): void {
         super.updateConfig(update);
@@ -244,6 +249,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         if (this.isWidgetBooted) {
             return;
         }
+        this.dispatchEvent(AnnotoPluginEventType.ANNOTO_WIDGET_BOOT);
         Annoto.boot(this.widgetConfig);
         this.isWidgetBooted = true;
         const bodyElement = document.querySelector('body');

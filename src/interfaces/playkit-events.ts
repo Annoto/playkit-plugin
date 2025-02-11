@@ -349,10 +349,17 @@ const AdEventType = {
     AD_AUTOPLAY_FAILED: 'adautoplayfailed'
 };
 
+const AnnotoPluginEventType = {
+    ANNOTO_SERVICE_READY: 'annotoserviceready',
+    ANNOTO_INIT_DONE: 'annotoinitdone',
+    ANNOTO_WIDGET_BOOT: 'annotowidgetboot',
+};
+
 const EventType = {
     ...Html5EventType,
     ...CustomEventType,
-    ...AdEventType
+    ...AdEventType,
+    ...AnnotoPluginEventType,
 };
 
-export { EventType, Html5EventType, CustomEventType };
+export { EventType, Html5EventType, CustomEventType, AnnotoPluginEventType };
