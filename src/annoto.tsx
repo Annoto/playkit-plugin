@@ -83,7 +83,9 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         return super.getName();
     }
     dispatchEvent(name: string, payload?: any): void {
-        return super.dispatchEvent(name, payload);
+        try {
+            super.dispatchEvent(name, payload);
+        } catch (err) {}
     }
     updateConfig({ bootstrapUrl, clientId, ...update }: Partial<IAnnotoPlaykitPluginConfig>): void {
         super.updateConfig(update);
