@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/Annoto/playkit-plugin/compare/0.4.3...1.0.0) (2025-02-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* use manual widget boot by default ([#40](https://github.com/Annoto/playkit-plugin/issues/40))
+
+### Features
+
+* use manual widget boot by default ([#40](https://github.com/Annoto/playkit-plugin/issues/40)) ([5e84a9c](https://github.com/Annoto/playkit-plugin/commit/5e84a9c33a72102881ee1031eab8d672f08ad43b))
+
 ## [0.4.3](https://github.com/Annoto/playkit-plugin/compare/0.4.2...0.4.3) (2025-01-22)
 
 
