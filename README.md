@@ -45,7 +45,7 @@ To use the plugin, just add plugin bundle script to the page and setup the playe
 ```html
 <script src="https://cdnapisec.kaltura.com/p/2302901/embedPlaykitJs/uiconf_id/50617632"></script>
 <!--Kaltura player-->
-<script src="https://cdn.annoto.net/playkit-plugin/latest/plugin.js"></script>
+<script src="https://cdn.annoto.net/playkit-plugin/latest/plugin.js?auto_boot=1"></script>
 <!--PlayKit Annoto plugin-->
 <div id="kaltura_player_541994816" style="width: 100%; height: 560px;"></div>
 
@@ -57,6 +57,7 @@ To use the plugin, just add plugin bundle script to the page and setup the playe
             // set the clientId, if not provided, Annoto will load in demo mode
             annoto: {
                 // clientId: 'eyJhbGciOiJIUzI1NiJ9.ZjU4MTMy...',
+                // manualBoot: true, // to manualy boot the widget or remove auto_boot=1 from the script src
             },
         }
     };
@@ -66,6 +67,7 @@ To use the plugin, just add plugin bundle script to the page and setup the playe
     // To use the annoto api, use the 'annoto' service:
 
     const annotoService = kalturaPlayer.getService('annoto');
+    // annotoService.boot(); manual boot
     annotoService.getApi().then((api) => {
         console.info('api: ', api);
     });
