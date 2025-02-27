@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/Annoto/playkit-plugin/compare/1.1.0...1.1.1) (2025-02-27)
+
+
+### Bug Fixes
+
+* css selector to work for v2-v7 redirect when used in KMS ([#44](https://github.com/Annoto/playkit-plugin/issues/44)) ([9d06cff](https://github.com/Annoto/playkit-plugin/commit/9d06cfffc33941cff9c8b701a2baf00616252832))
+
 ## [1.1.0](https://github.com/Annoto/playkit-plugin/compare/1.0.0...1.1.0) (2025-02-11)
 
 
