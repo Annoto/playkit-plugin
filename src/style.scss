@@ -44,17 +44,6 @@
     }
 }
 
-.nnk-widget.nnk-setup {
-    #mediaContainer {
-        #wrapper.video {
-            overflow: visible;
-            .playkit-floating-container {
-                overflow: visible;
-            }
-        }
-    }
-}
-
 .playkit-floating-container {
     &.playkit-floating-active {
         .kaltura-player-container:not(:fullscreen) {
@@ -62,6 +51,17 @@
                 .annoto-resizable {
                     visibility: hidden;
                 }
+            }
+        }
+    }
+}
+
+/* .nnk-widget.nnk-setup {
+    #mediaContainer {
+        #wrapper.video {
+            overflow: visible;
+            .playkit-floating-container {
+                overflow: visible;
             }
         }
     }
@@ -78,4 +78,4 @@
             height: auto !important;
         }
     }
-}
+} */
