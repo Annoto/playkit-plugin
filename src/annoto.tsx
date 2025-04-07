@@ -182,6 +182,33 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         return this.player.getService('sidePanelsManager') as IPlaykitSidePanelsManager;
     }
 
+    private get bodyElement(): HTMLElement {
+        return document.querySelector('body')!;
+    }
+
+    private isInIframe(): boolean {
+        try {
+            return self !== window.parent;
+        } catch (e) {}
+        return true;
+    }
+
+    private get isBrowseAndEmbed(): boolean {
+        return !!(this.bodyElement?.classList.contains('module-browseandembed') && this.isInIframe);
+    }
+
+    private get isGallery(): boolean {
+        return !!(this.bodyElement?.classList.contains('module-default') && this.isInIframe);
+    }
+
+    private get contentWrapEl(): HTMLElement | null {
+        return this.containerEl?.closest('#contentWrap')!;
+    }
+
+    private get mediaContainerEl(): HTMLElement | null {
+        return this.containerEl?.closest('#mediaContainer');
+    }
+
     /*
     private showSidePanel(): void {
         // this.sidePanelsManager.activateItem(this.sidePanelItemId!);
@@ -202,7 +229,9 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
             const dom = (KalturaPlayer.core.utils as any).Dom;
             const appEl = dom.createElement('div');
             dom.setAttribute(appEl, 'id', 'annoto-app');
-            dom.appendChild(this.containerEl, appEl);
+            const appContainer =
+                (this.isBrowseAndEmbed || this.isGallery) ? this.mediaContainerEl || this.contentWrapEl || this.containerEl : this.containerEl;
+            dom.appendChild(appContainer, appEl);
 
             await dom.loadScriptAsync(widgetUrl);
             this.bootstrapDone();
@@ -252,16 +281,12 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         this.dispatchEvent(AnnotoPluginEventType.ANNOTO_WIDGET_BOOT);
         Annoto.boot(this.widgetConfig);
         this.isWidgetBooted = true;
-        const bodyElement = document.querySelector('body');
-        let inIframe = false;
-        try {
-            inIframe = self !== window.parent
-        } catch (e) { }
-        if (bodyElement!.classList.contains('module-browseandembed') && inIframe) {
+        
+        /* if (this.isBrowseAndEmbed) {
             this.player.addEventListener(CustomEventType.RESIZE, () => {
                 setTimeout(this.iframeEmbedFixOnsizeChangeHandle);
             });
-        }
+        } */
 
         Annoto.on('ready' as any, (api: IAnnotoApi) => {
             this.widgetApi = api;
@@ -324,7 +349,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         return config;
     }
 
-    private iframeEmbedFixOnsizeChangeHandle = () => {
+    /* private iframeEmbedFixOnsizeChangeHandle = () => {
         const htmlEl = document.querySelector('html');
         if (this.canHeightCauseScrollbar()) {
             htmlEl!.classList.add('annoto-playkit-plugin-iframe-embed-fix');
@@ -340,7 +365,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         }
         const innerHeight = window.innerHeight;
         return !!(h >= (innerHeight - 50));
-    }
+    } */
 
     // for service usage
 
