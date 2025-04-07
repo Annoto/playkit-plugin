@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/Annoto/playkit-plugin/compare/1.1.1...1.2.0) (2025-04-07)
+
+
+### Features
+
+* add support for new kaf theming ([#46](https://github.com/Annoto/playkit-plugin/issues/46)) ([f11a8af](https://github.com/Annoto/playkit-plugin/commit/f11a8af40d01ff473e63691fc92721a9f969f8e3))
+
 ## [1.1.1](https://github.com/Annoto/playkit-plugin/compare/1.1.0...1.1.1) (2025-02-27)
 
 
