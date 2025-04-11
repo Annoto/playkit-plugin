@@ -1,4 +1,3 @@
-
 declare const process: {
     env: {
         version: string;
@@ -11,3 +10,5 @@ declare const process: {
 export const BUILD_ENV = {
     ...process.env,
 };
+
+export const pluginName = 'annoto';

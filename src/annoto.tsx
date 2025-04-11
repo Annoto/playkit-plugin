@@ -53,7 +53,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
 
     constructor(name: string, player: IPlaykitPlayer, { bootstrapUrl, manualBoot, ...config}: IAnnotoPlaykitPluginConfig) {
         super(name, player, { bootstrapUrl, manualBoot, ...config });
-        this.logger.debug('constructor');
+        this.logger.debug('constructor', { manualBoot, bootstrapUrl, config });
         this.awaitBootstrap = new Promise((resolve) => {
             this.bootstrapDone = resolve;
         });
@@ -71,7 +71,11 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
 
         this.init().then(() => {
             this.dispatchEvent(AnnotoPluginEventType.ANNOTO_INIT_DONE);
-            if (manualBoot === false || (PlaykitAnnotoPlugin.AUTO_BOOT === true && manualBoot !== true)) {
+            if (
+                manualBoot === false ||
+                (manualBoot as unknown as string) === 'false' ||
+                (PlaykitAnnotoPlugin.AUTO_BOOT === true && manualBoot !== true)
+            ) {
                 return this.boot();
             } else {
                 this.logger.info('skip automatic boot');

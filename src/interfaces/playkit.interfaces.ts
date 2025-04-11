@@ -6,7 +6,9 @@ export interface IKalturaPlayerGlobal extends IKalturaPlayer {
     getPlayers(): { [key: string]: IPlaykitPlayer };
 }
 
-export interface IPlaykitPlayer extends IFakeEventTarget, Omit<KalturaPlayerTypes.Player, 'addEventListener' | 'removeEventListener' | 'dispatchEvent'> {
+export interface IPlaykitPlayer
+    extends IFakeEventTarget,
+        Omit<KalturaPlayerTypes.Player, 'addEventListener' | 'removeEventListener' | 'dispatchEvent'> {
     /**
      * The player readiness
      * @returns The ready promise
@@ -208,12 +210,13 @@ export interface IPlaykitPlayer extends IFakeEventTarget, Omit<KalturaPlayerType
      */
     readonly buffered?: TimeRanges;
 
-    readonly stats: { targetBuffer: number; availableBuffer: number; };
+    readonly stats: { targetBuffer: number; availableBuffer: number };
 
+    readonly _pluginManager: IPlaykitPluginManager;
+    readonly _pluginsConfig: { [name: string]: unknown };
 }
 
 interface IFakeEventTarget {
-
     /**
      * Add an event listener to this object.
      *
@@ -250,7 +253,6 @@ export interface IPlaykitSession extends KalturaPlayerTypes.Session {
 }
 
 export type PlaykitListenerType = (event: IFakeEvent) => void | boolean;
-
 
 export interface IFakeEvent {
     readonly bubbles: boolean;
@@ -294,61 +296,61 @@ export interface IFakeEvent {
 }
 
 export interface IOVPProviderMediaInfoObject extends KalturaPlayerTypes.MediaInfo {
-    entryId?: string,
-    ks?: string
+    entryId?: string;
+    ks?: string;
 }
 
 export interface IOTTProviderMediaInfoObject extends IOVPProviderMediaInfoObject {
-    mediaType?: string,
-    contextType?: string,
-    protocol?: string,
-    fileIds?: string,
-    assetReferenceType?: string,
-    formats?: Array<string>
+    mediaType?: string;
+    contextType?: string;
+    protocol?: string;
+    fileIds?: string;
+    assetReferenceType?: string;
+    formats?: Array<string>;
 }
 
 export type IProviderMediaInfoObject = IOVPProviderMediaInfoObject | IOTTProviderMediaInfoObject;
 
 export interface IProviderMediaConfigObject {
-    session: IProviderMediaConfigSessionObject,
-    sources: IProviderMediaConfigSourcesObject,
-    plugins: { [plugin: string]: Object }
+    session: IProviderMediaConfigSessionObject;
+    sources: IProviderMediaConfigSourcesObject;
+    plugins: { [plugin: string]: Object };
 }
 
 export interface IProviderMediaConfigSessionObject {
-    partnerId: number,
-    uiConfId?: number,
-    ks?: string
+    partnerId: number;
+    uiConfId?: number;
+    ks?: string;
 }
 
 export interface IProviderMediaConfigSourcesObject {
-    dash: Array<IProviderMediaSourceObject>,
-    hls: Array<IProviderMediaSourceObject>,
-    progressive: Array<IProviderMediaSourceObject>,
-    duration: number,
-    type: string,
-    id: string,
-    poster: string | Array<Object>,
-    dvr: boolean,
-    vr?: any,
-    metadata: IProviderMediaConfigMetadataObject,
-    captions?: Array<IPKExternalCaptionObject>
+    dash: Array<IProviderMediaSourceObject>;
+    hls: Array<IProviderMediaSourceObject>;
+    progressive: Array<IProviderMediaSourceObject>;
+    duration: number;
+    type: string;
+    id: string;
+    poster: string | Array<Object>;
+    dvr: boolean;
+    vr?: any;
+    metadata: IProviderMediaConfigMetadataObject;
+    captions?: Array<IPKExternalCaptionObject>;
 }
 
 export interface IProviderMediaSourceObject {
-    id: string,
-    url: string,
-    mimetype: string,
-    bandwidth?: number,
-    width?: number,
-    height?: number,
-    label?: string,
-    drmData?: Array<IProviderDrmDataObject>
+    id: string;
+    url: string;
+    mimetype: string;
+    bandwidth?: number;
+    width?: number;
+    height?: number;
+    label?: string;
+    drmData?: Array<IProviderDrmDataObject>;
 }
 
 export interface IProviderMediaConfigMetadataObject {
-    name: string,
-    description: string
+    name: string;
+    description: string;
 }
 
 type IPKExternalCaptionObject = any;
@@ -356,12 +358,12 @@ type IProviderDrmDataObject = any;
 
 export enum PluginPositions {
     HORIZONTAL = 'horizontal',
-    VERTICAL = 'vertical'
+    VERTICAL = 'vertical',
 }
 
 export enum PluginStates {
     OPENED = 'opened',
-    CLOSED = 'closed'
+    CLOSED = 'closed',
 }
 
 export interface IPlaykitBasePlugin extends KalturaPlayerTypes.BasePlugin {
@@ -374,7 +376,7 @@ export interface IPlaykitBasePlugin extends KalturaPlayerTypes.BasePlugin {
      * If you wish the player load and play (and middlewares interception) to wait for some async action (i.e loading a 3rd party library),
      * you can override and return a Promise which is resolved when the plugin completes all async requirements.
      */
-    readonly ready: Promise<void>
+    readonly ready: Promise<void>;
     /**
      * The player will call this method before destroying itself.
      */
@@ -383,8 +385,9 @@ export interface IPlaykitBasePlugin extends KalturaPlayerTypes.BasePlugin {
      * The player will call this method before changing media.
      */
     reset(): void;
-}
 
+    getUIComponents?(): IPlaykitUiComponent[];
+}
 
 // ******** UI Manager ********** //
 
@@ -399,29 +402,29 @@ export interface IPlaykitUiComponent {
     presets: PlaykitUI.ReservedPresetName[];
     area: PlaykitReservedPresetAreaType;
     get: Function;
-    props?: { [key: string]: any; };
+    props?: { [key: string]: any };
     beforeComponent?: string;
     afterComponent?: string;
     replaceComponent?: string;
     container?: string;
 }
 
-export type PlaykitReservedPresetAreaType = 'PresetFloating' |
-    'BottomBarLeftControls' |
-    'BottomBarRightControls' |
-    'TopBarLeftControls' |
-    'TopBarRightControls' |
-    'SidePanelTop' |
-    'SidePanelLeft' |
-    'SidePanelRight' |
-    'SidePanelBottom' |
-    'PresetArea' |
-    'InteractiveArea' |
-    'PlayerArea' |
-    'VideoArea' |
-    'BottomBar' |
-    'SeekBar';
-
+export type PlaykitReservedPresetAreaType =
+    | 'PresetFloating'
+    | 'BottomBarLeftControls'
+    | 'BottomBarRightControls'
+    | 'TopBarLeftControls'
+    | 'TopBarRightControls'
+    | 'SidePanelTop'
+    | 'SidePanelLeft'
+    | 'SidePanelRight'
+    | 'SidePanelBottom'
+    | 'PresetArea'
+    | 'InteractiveArea'
+    | 'PlayerArea'
+    | 'VideoArea'
+    | 'BottomBar'
+    | 'SeekBar';
 
 /**
  * https://github.com/kaltura/playkit-js-ui/tree/master/flow-typed/types
@@ -491,7 +494,7 @@ export interface IPlaykitPanelComponentProps {
     isActive: boolean;
 }
 
-export interface IPlaykitIconComponentProps extends IPlaykitPanelComponentProps { }
+export interface IPlaykitIconComponentProps extends IPlaykitPanelComponentProps {}
 
 export interface IPlaykitState {
     shell: IPlaykitShellState;
@@ -507,3 +510,15 @@ export interface IPlaykitShellState {
 }
 
 export type PlaykitSidePanelMode = PlaykitUI.SidePanelMode;
+
+// ****** Kaltura Player Types ******** //
+
+export interface IPlaykitPluginManager {
+    get(name: string): IPlaykitBasePlugin | undefined;
+    getAll(): { [name: string]: IPlaykitBasePlugin };
+    load(name: string, player: IPlaykitPlayer, config: unknown): void;
+    getRegisterdPluginsList(): string[];
+    loadMedia(): void;
+    destroy(): void;
+    reset(): void;
+}
