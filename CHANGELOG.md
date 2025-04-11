@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/Annoto/playkit-plugin/compare/1.2.0...1.3.0) (2025-04-11)
+
+
+### Features
+
+* add support for autoboot via script or global parameters ([#48](https://github.com/Annoto/playkit-plugin/issues/48)) ([512f9e2](https://github.com/Annoto/playkit-plugin/commit/512f9e24c991e3f249f9a978bbe6209f08aae222))
+
 ## [1.2.0](https://github.com/Annoto/playkit-plugin/compare/1.1.1...1.2.0) (2025-04-07)
 
 
