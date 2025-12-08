@@ -1,9 +1,4 @@
-import {
-    IConfig,
-    IAnnotoApi,
-    Annoto as AnnotoMain,
-    IWidgetConfig,
-} from '@annoto/widget-api';
+import { IConfig, IAnnotoApi, Annoto as AnnotoMain, IWidgetConfig } from '@annoto/widget-api';
 import {
     CustomEventType,
     AnnotoPluginEventType,
@@ -51,7 +46,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         return true;
     }
 
-    constructor(name: string, player: IPlaykitPlayer, { bootstrapUrl, manualBoot, ...config}: IAnnotoPlaykitPluginConfig) {
+    constructor(name: string, player: IPlaykitPlayer, { bootstrapUrl, manualBoot, ...config }: IAnnotoPlaykitPluginConfig) {
         super(name, player, { bootstrapUrl, manualBoot, ...config });
         this.logger.debug('constructor', { manualBoot, bootstrapUrl, config });
         this.awaitBootstrap = new Promise((resolve) => {
@@ -63,24 +58,26 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         this.containerEl = player.getView().closest('.kaltura-player-container')!;
         this.adaptor = new PlaykitPlayerAdaptor(player, this);
         this.service = new PlaykitAnnotoService(this);
-        
+
         this.widgetConfig = this.mergeConfigUpdate(config);
 
         this.player.registerService('annoto', this.service);
         this.dispatchEvent(AnnotoPluginEventType.ANNOTO_SERVICE_READY);
 
-        this.init().then(() => {
-            this.dispatchEvent(AnnotoPluginEventType.ANNOTO_INIT_DONE);
-            if (
-                manualBoot === false ||
-                (manualBoot as unknown as string) === 'false' ||
-                (PlaykitAnnotoPlugin.AUTO_BOOT === true && manualBoot !== true)
-            ) {
-                return this.boot();
-            } else {
-                this.logger.info('skip automatic boot');
-            } 
-        }).catch((err) => {});
+        this.init()
+            .then(() => {
+                this.dispatchEvent(AnnotoPluginEventType.ANNOTO_INIT_DONE);
+                if (
+                    manualBoot === false ||
+                    (manualBoot as unknown as string) === 'false' ||
+                    (PlaykitAnnotoPlugin.AUTO_BOOT === true && manualBoot !== true)
+                ) {
+                    return this.boot();
+                } else {
+                    this.logger.info('skip automatic boot');
+                }
+            })
+            .catch((err) => {});
     }
 
     getName(): string {
@@ -100,13 +97,9 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         return this.asyncReady();
     }
 
-    reset(): void {
+    reset(): void {}
 
-    }
-
-    destroy(): void {
-
-    }
+    destroy(): void {}
 
     async boot(configUpdate?: Partial<IConfig>): Promise<IAnnotoApi> {
         if (this.isWidgetBooted) {
@@ -116,7 +109,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         this.logger.info('boot');
         try {
             await this.awaitBootstrap;
-            
+
             this.widgetConfig = this.mergeConfigUpdate(configUpdate);
             this.bootWidget();
             await this.awaitBoot;
@@ -128,20 +121,27 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
     }
 
     loadMedia(): void {
-        for (const remove of this.removeHandlers) {
-            remove();
+        if (this.removeHandlers?.length) {
+            // Already loaded, we do not want to remove existing components. Can be called multiple times for playlists for example.
+            // If removed, it breaks the widget.
+            return;
         }
-        this.removeHandlers = [];
 
-        this.removeHandlers.push(this.player.ui.addComponent({
-            label: 'annoto-timeline',
-            area: 'BottomBar',
-            presets: ['Playback', 'Live'],
-            get: () => <AnnotoTimelineComponent onReady={(el) => {
-                this.adaptor.setControlsElement(el);
-            }} />,
-        }));
-        
+        this.removeHandlers.push(
+            this.player.ui.addComponent({
+                label: 'annoto-timeline',
+                area: 'BottomBar',
+                presets: ['Playback', 'Live'],
+                get: () => (
+                    <AnnotoTimelineComponent
+                        onReady={(el) => {
+                            this.adaptor.setControlsElement(el);
+                        }}
+                    />
+                ),
+            })
+        );
+
         /* this.removeHandlers.push(this.player.ui.addComponent({
             label: 'annoto-widget',
             area: 'SidePanelRight',
@@ -169,7 +169,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
             }
         }); */
     }
-    
+
     get annotoApi(): Promise<IAnnotoApi> {
         return (async () => {
             await this.awaitBoot;
@@ -213,6 +213,13 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         return this.containerEl?.closest('#mediaContainer');
     }
 
+    private removeComponentHandlers(): void {
+        for (const remove of this.removeHandlers) {
+            remove();
+        }
+        this.removeHandlers = [];
+    }
+
     /*
     private showSidePanel(): void {
         // this.sidePanelsManager.activateItem(this.sidePanelItemId!);
@@ -234,14 +241,14 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
             const appEl = dom.createElement('div');
             dom.setAttribute(appEl, 'id', 'annoto-app');
             const appContainer =
-                (this.isBrowseAndEmbed || this.isGallery) ? this.mediaContainerEl || this.contentWrapEl || this.containerEl : this.containerEl;
+                this.isBrowseAndEmbed || this.isGallery ? this.mediaContainerEl || this.contentWrapEl || this.containerEl : this.containerEl;
             dom.appendChild(appContainer, appEl);
 
             await dom.loadScriptAsync(widgetUrl);
             this.bootstrapDone();
         } catch (err) {
             this.logger.error('widget bootstrap: ', err);
-            this.bootstrapDone()
+            this.bootstrapDone();
             return;
         }
     }
@@ -285,7 +292,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         this.dispatchEvent(AnnotoPluginEventType.ANNOTO_WIDGET_BOOT);
         Annoto.boot(this.widgetConfig);
         this.isWidgetBooted = true;
-        
+
         /* if (this.isBrowseAndEmbed) {
             this.player.addEventListener(CustomEventType.RESIZE, () => {
                 setTimeout(this.iframeEmbedFixOnsizeChangeHandle);
@@ -306,13 +313,17 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         // this.player.ui.store.subscribe(this.updateSidePanelClasses);
     }
 
-    private updateSidePanelClasses = throttle(() => {
-        const { left, right } = this.sidePanelsManager?.activePanels || {};
-        const { shell } = this.player.ui.store.getState() as IPlaykitState || {};
-        const { sidePanelsModes } = shell || {};
-        this.containerEl.classList.toggle('nn-player-side-panel-left', !!left && sidePanelsModes?.left === 'alongside');
-        this.containerEl.classList.toggle('nn-player-side-panel-right', !!right && sidePanelsModes?.right === 'alongside');
-    }, 200, { debounceLast: true });
+    private updateSidePanelClasses = throttle(
+        () => {
+            const { left, right } = this.sidePanelsManager?.activePanels || {};
+            const { shell } = (this.player.ui.store.getState() as IPlaykitState) || {};
+            const { sidePanelsModes } = shell || {};
+            this.containerEl.classList.toggle('nn-player-side-panel-left', !!left && sidePanelsModes?.left === 'alongside');
+            this.containerEl.classList.toggle('nn-player-side-panel-right', !!right && sidePanelsModes?.right === 'alongside');
+        },
+        200,
+        { debounceLast: true }
+    );
 
     /* private handleWidgetTransition() {
         const playerContainer = this.getPlayerContainer();
@@ -339,7 +350,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         return this.player.getView().closest('.kaltura-player-container');
     } */
 
-    private setupHookHandle = async ({ config }: { widgetIndex: number; config: IConfig; mediaSrc: string; }): Promise<IConfig> => {
+    private setupHookHandle = async ({ config }: { widgetIndex: number; config: IConfig; mediaSrc: string }): Promise<IConfig> => {
         const { player } = this;
 
         if (player.isLive() && !player.isDvr()) {
@@ -351,7 +362,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         }
 
         return config;
-    }
+    };
 
     /* private iframeEmbedFixOnsizeChangeHandle = () => {
         const htmlEl = document.querySelector('html');
