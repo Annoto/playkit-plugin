@@ -99,7 +99,9 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
 
     reset(): void {}
 
-    destroy(): void {}
+    destroy(): void {
+        this.removeComponentHandlers();
+    }
 
     async boot(configUpdate?: Partial<IConfig>): Promise<IAnnotoApi> {
         if (this.isWidgetBooted) {
