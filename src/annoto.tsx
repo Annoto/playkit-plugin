@@ -255,7 +255,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
             const appContainer =
                 this.isBrowseAndEmbed || this.isGallery ? this.mediaContainerEl || this.contentWrapEl || this.containerEl : this.containerEl;
             dom.appendChild(appContainer, appEl);
-            this.observeDialogRoots(appEl);
+            this.observeDialogRoots(appContainer);
 
             await dom.loadScriptAsync(widgetUrl);
             this.bootstrapDone();
@@ -271,33 +271,33 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
      * element's PARENT rather than into the app element itself, and that parent changes when the
      * player goes fullscreen. Marking the app element alone therefore leaves every dialog outside
      * the `.aadRoot` opt out, and the player keeps stealing "k" while the user types in one.
-     * Mark each dialog as it is inserted instead. The marker must never end up on an ancestor that
+     * Mark each dialog as it is inserted instead. The marker must never end up on an element that
      * also covers the player's own UI, or the player would lose the shortcut everywhere.
      */
-    private observeDialogRoots(appEl: HTMLElement): void {
-        // `annoto` is the widget's root class, applied to every root it mounts outside the app
-        // element - dialogs, dap, notifications - so it anchors this to widget markup that exists
-        // to be styled rather than to a dialog specific tag or class.
-        const markAnnotoRoots = (node: Node): void => {
-            if (!(node instanceof HTMLElement)) {
-                return;
-            }
-            if (node.classList.contains('annoto')) {
+    private observeDialogRoots(appContainer: HTMLElement | null): void {
+        if (!appContainer) {
+            // nothing to observe, and the widget still bootstraps: it falls back to creating its
+            // own container on the body when ours is missing
+            return;
+        }
+
+        // Match the dialog container specifically, not the widget's generic `annoto` root class.
+        // That class is also on UI mounted into the player's own chrome - the timeline overlay in
+        // the control bar, the reactions fab - and the player tests `.aadRoot` against
+        // document.activeElement, so marking those would suppress its shortcut as soon as the user
+        // clicked one. Dialogs are the only Annoto surface outside the app element that takes text.
+        const markDialogRoot = (node: Node): void => {
+            if (node instanceof HTMLElement && node.classList.contains('annoto-dialog-container')) {
                 node.classList.add('aadRoot');
             }
-            node.querySelectorAll('.annoto').forEach((el: Element) => el.classList.add('aadRoot'));
         };
 
         this.dialogRootObserver = new MutationObserver((mutations: MutationRecord[]) => {
-            mutations.forEach((mutation: MutationRecord) => {
-                // the widget's own DOM churns inside the app element, which is already marked
-                if (appEl === mutation.target || appEl.contains(mutation.target)) {
-                    return;
-                }
-                mutation.addedNodes.forEach(markAnnotoRoots);
-            });
+            mutations.forEach((mutation: MutationRecord) => mutation.addedNodes.forEach(markDialogRoot));
         });
-        this.dialogRootObserver.observe(this.containerEl, { childList: true, subtree: true });
+        // subtree, because in fullscreen the widget reparents the app element - and with it the
+        // dialog host - to an element nested inside the container
+        this.dialogRootObserver.observe(appContainer, { childList: true, subtree: true });
     }
 
     private mergeConfigUpdate(update?: Partial<IConfig>): IConfig {
