@@ -259,6 +259,9 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
             this.bootstrapDone();
         } catch (err) {
             this.logger.error('widget bootstrap: ', err);
+            // the widget never loaded, so no dialog will ever appear for the observer to mark
+            this.dialogRootObserver?.disconnect();
+            this.dialogRootObserver = undefined;
             this.bootstrapDone();
             return;
         }
