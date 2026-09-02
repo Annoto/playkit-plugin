@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/Annoto/playkit-plugin/compare/1.3.1...1.3.2) (2026-09-02)
+
+
+### Bug Fixes
+
+* stop the player k shortcut from stealing keys typed in Annoto UI ([#53](https://github.com/Annoto/playkit-plugin/issues/53)) ([ae7f658](https://github.com/Annoto/playkit-plugin/commit/ae7f658c71b8a5a20c77d44d911f6048f5359eeb))
+
 ## [1.3.1](https://github.com/Annoto/playkit-plugin/compare/1.3.0...1.3.1) (2025-12-09)
 
 
