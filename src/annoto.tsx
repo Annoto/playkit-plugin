@@ -38,6 +38,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
     private isWidgetBooted = false;
     private containerEl: HTMLElement;
     private removeHandlers: PlaykitRemoveComponentHandlerType[] = [];
+    private dialogRootObserver?: MutationObserver;
     private onSetupHandler?: (config: IConfig) => Promise<IConfig>;
     // private sidePanelItemId?: number;
 
@@ -101,6 +102,8 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
 
     destroy(): void {
         this.removeComponentHandlers();
+        this.dialogRootObserver?.disconnect();
+        this.dialogRootObserver = undefined;
     }
 
     async boot(configUpdate?: Partial<IConfig>): Promise<IAnnotoApi> {
@@ -242,17 +245,52 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
             const dom = (KalturaPlayer.core.utils as any).Dom;
             const appEl = dom.createElement('div');
             dom.setAttribute(appEl, 'id', 'annoto-app');
+            // The player binds a document level, capture phase keydown for "k", so nothing in our
+            // subtree can stop it. Its typing guard checks ev.target.isContentEditable - false for
+            // our editors, whose contenteditable sits in a shadow root - but it also opts out of
+            // anything inside `.aadRoot`, testing both ev.target and document.activeElement.
+            appEl.classList.add('aadRoot');
             const appContainer =
                 this.isBrowseAndEmbed || this.isGallery ? this.mediaContainerEl || this.contentWrapEl || this.containerEl : this.containerEl;
             dom.appendChild(appContainer, appEl);
+            this.observeDialogRoots(appContainer);
 
             await dom.loadScriptAsync(widgetUrl);
             this.bootstrapDone();
         } catch (err) {
             this.logger.error('widget bootstrap: ', err);
+            // the widget never loaded, so no dialog will ever appear for the observer to mark
+            this.dialogRootObserver?.disconnect();
+            this.dialogRootObserver = undefined;
             this.bootstrapDone();
             return;
         }
+    }
+
+    /**
+     * The widget mounts its dialogs in the app element's parent rather than inside it, and that
+     * parent moves when the player goes fullscreen - so mark them as they are inserted.
+     */
+    private observeDialogRoots(appContainer: HTMLElement | null): void {
+        if (!appContainer) {
+            // the widget falls back to its own container on the body
+            return;
+        }
+
+        // Match the dialog container, not the widget's generic `annoto` root class: that class is
+        // also on UI inside the player's chrome (timeline overlay, reactions fab), which the guard
+        // would then opt out via document.activeElement, costing the player its own shortcut.
+        const markDialogRoot = (node: Node): void => {
+            if (node instanceof HTMLElement && node.classList.contains('annoto-dialog-container')) {
+                node.classList.add('aadRoot');
+            }
+        };
+
+        this.dialogRootObserver = new MutationObserver((mutations: MutationRecord[]) => {
+            mutations.forEach((mutation: MutationRecord) => mutation.addedNodes.forEach(markDialogRoot));
+        });
+        // subtree: fullscreen reparents the app element, and the dialog host with it
+        this.dialogRootObserver.observe(appContainer, { childList: true, subtree: true });
     }
 
     private mergeConfigUpdate(update?: Partial<IConfig>): IConfig {
