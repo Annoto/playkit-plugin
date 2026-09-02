@@ -38,6 +38,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
     private isWidgetBooted = false;
     private containerEl: HTMLElement;
     private removeHandlers: PlaykitRemoveComponentHandlerType[] = [];
+    private dialogRootObserver?: MutationObserver;
     private onSetupHandler?: (config: IConfig) => Promise<IConfig>;
     // private sidePanelItemId?: number;
 
@@ -101,6 +102,8 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
 
     destroy(): void {
         this.removeComponentHandlers();
+        this.dialogRootObserver?.disconnect();
+        this.dialogRootObserver = undefined;
     }
 
     async boot(configUpdate?: Partial<IConfig>): Promise<IAnnotoApi> {
@@ -242,9 +245,17 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
             const dom = (KalturaPlayer.core.utils as any).Dom;
             const appEl = dom.createElement('div');
             dom.setAttribute(appEl, 'id', 'annoto-app');
+            // The player Shell binds a document level, capture phase keydown handler for the "k"
+            // play/pause shortcut, so nothing inside our subtree can stop it. Its "user is typing"
+            // guard tests ev.target.isContentEditable, which is false for our rich content editors:
+            // the contenteditable lives inside the nnc-rich-content-editor shadow root, so the
+            // retargeted target is the host element. `.aadRoot` is the opt out the same condition
+            // checks, on both ev.target and document.activeElement.
+            appEl.classList.add('aadRoot');
             const appContainer =
                 this.isBrowseAndEmbed || this.isGallery ? this.mediaContainerEl || this.contentWrapEl || this.containerEl : this.containerEl;
             dom.appendChild(appContainer, appEl);
+            this.observeDialogRoots(appEl);
 
             await dom.loadScriptAsync(widgetUrl);
             this.bootstrapDone();
@@ -253,6 +264,40 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
             this.bootstrapDone();
             return;
         }
+    }
+
+    /**
+     * The widget mounts its dialogs (CTA, reflection point, dashboard, user space) into the app
+     * element's PARENT rather than into the app element itself, and that parent changes when the
+     * player goes fullscreen. Marking the app element alone therefore leaves every dialog outside
+     * the `.aadRoot` opt out, and the player keeps stealing "k" while the user types in one.
+     * Mark each dialog as it is inserted instead. The marker must never end up on an ancestor that
+     * also covers the player's own UI, or the player would lose the shortcut everywhere.
+     */
+    private observeDialogRoots(appEl: HTMLElement): void {
+        // `annoto` is the widget's root class, applied to every root it mounts outside the app
+        // element - dialogs, dap, notifications - so it anchors this to widget markup that exists
+        // to be styled rather than to a dialog specific tag or class.
+        const markAnnotoRoots = (node: Node): void => {
+            if (!(node instanceof HTMLElement)) {
+                return;
+            }
+            if (node.classList.contains('annoto')) {
+                node.classList.add('aadRoot');
+            }
+            node.querySelectorAll('.annoto').forEach((el: Element) => el.classList.add('aadRoot'));
+        };
+
+        this.dialogRootObserver = new MutationObserver((mutations: MutationRecord[]) => {
+            mutations.forEach((mutation: MutationRecord) => {
+                // the widget's own DOM churns inside the app element, which is already marked
+                if (appEl === mutation.target || appEl.contains(mutation.target)) {
+                    return;
+                }
+                mutation.addedNodes.forEach(markAnnotoRoots);
+            });
+        });
+        this.dialogRootObserver.observe(this.containerEl, { childList: true, subtree: true });
     }
 
     private mergeConfigUpdate(update?: Partial<IConfig>): IConfig {
