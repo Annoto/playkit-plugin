@@ -245,12 +245,10 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
             const dom = (KalturaPlayer.core.utils as any).Dom;
             const appEl = dom.createElement('div');
             dom.setAttribute(appEl, 'id', 'annoto-app');
-            // The player Shell binds a document level, capture phase keydown handler for the "k"
-            // play/pause shortcut, so nothing inside our subtree can stop it. Its "user is typing"
-            // guard tests ev.target.isContentEditable, which is false for our rich content editors:
-            // the contenteditable lives inside the nnc-rich-content-editor shadow root, so the
-            // retargeted target is the host element. `.aadRoot` is the opt out the same condition
-            // checks, on both ev.target and document.activeElement.
+            // The player binds a document level, capture phase keydown for "k", so nothing in our
+            // subtree can stop it. Its typing guard checks ev.target.isContentEditable - false for
+            // our editors, whose contenteditable sits in a shadow root - but it also opts out of
+            // anything inside `.aadRoot`, testing both ev.target and document.activeElement.
             appEl.classList.add('aadRoot');
             const appContainer =
                 this.isBrowseAndEmbed || this.isGallery ? this.mediaContainerEl || this.contentWrapEl || this.containerEl : this.containerEl;
@@ -267,25 +265,18 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
     }
 
     /**
-     * The widget mounts its dialogs (CTA, reflection point, dashboard, user space) into the app
-     * element's PARENT rather than into the app element itself, and that parent changes when the
-     * player goes fullscreen. Marking the app element alone therefore leaves every dialog outside
-     * the `.aadRoot` opt out, and the player keeps stealing "k" while the user types in one.
-     * Mark each dialog as it is inserted instead. The marker must never end up on an element that
-     * also covers the player's own UI, or the player would lose the shortcut everywhere.
+     * The widget mounts its dialogs in the app element's parent rather than inside it, and that
+     * parent moves when the player goes fullscreen - so mark them as they are inserted.
      */
     private observeDialogRoots(appContainer: HTMLElement | null): void {
         if (!appContainer) {
-            // nothing to observe, and the widget still bootstraps: it falls back to creating its
-            // own container on the body when ours is missing
+            // the widget falls back to its own container on the body
             return;
         }
 
-        // Match the dialog container specifically, not the widget's generic `annoto` root class.
-        // That class is also on UI mounted into the player's own chrome - the timeline overlay in
-        // the control bar, the reactions fab - and the player tests `.aadRoot` against
-        // document.activeElement, so marking those would suppress its shortcut as soon as the user
-        // clicked one. Dialogs are the only Annoto surface outside the app element that takes text.
+        // Match the dialog container, not the widget's generic `annoto` root class: that class is
+        // also on UI inside the player's chrome (timeline overlay, reactions fab), which the guard
+        // would then opt out via document.activeElement, costing the player its own shortcut.
         const markDialogRoot = (node: Node): void => {
             if (node instanceof HTMLElement && node.classList.contains('annoto-dialog-container')) {
                 node.classList.add('aadRoot');
@@ -295,8 +286,7 @@ export class PlaykitAnnotoPlugin extends (KalturaPlayer as any).BasePlugin imple
         this.dialogRootObserver = new MutationObserver((mutations: MutationRecord[]) => {
             mutations.forEach((mutation: MutationRecord) => mutation.addedNodes.forEach(markDialogRoot));
         });
-        // subtree, because in fullscreen the widget reparents the app element - and with it the
-        // dialog host - to an element nested inside the container
+        // subtree: fullscreen reparents the app element, and the dialog host with it
         this.dialogRootObserver.observe(appContainer, { childList: true, subtree: true });
     }
 
