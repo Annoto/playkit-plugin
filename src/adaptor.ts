@@ -2,6 +2,8 @@ import {
     IMediaDetails,
     IPlayerAdaptorApi,
     PlayerEventCallback,
+    captureUIEvents,
+    Disposable,
     CaptureUIEventCallback,
     ITextTrack,
 } from '@annoto/widget-api';
@@ -26,7 +28,7 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         event: string;
         fn: PlaykitListenerType;
     }[] = [];
-    private captureUIDispose?: (() => void);
+    private captureUIDisposable: Disposable | undefined;
 
     constructor(
         private readonly player: IPlaykitPlayer,
@@ -191,6 +193,22 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         cb();
     }
 
+    onCaptureUIEvent(cb: CaptureUIEventCallback): void {
+        if (this.captureUIDisposable) {
+            this.captureUIDisposable.dispose();
+        }
+        const { element } = this;
+        const progressBarEl = element?.querySelector('.playkit-seek-bar') as HTMLElement;
+        this.captureUIDisposable = captureUIEvents({
+            mouseEventsElements: [ progressBarEl ],
+            keyEventsElements: [ element as HTMLElement ],
+            mouseEvents: ['mousedown'],
+            keyEvents: ['keydown'],
+            getDuration: this.duration.bind(this),
+            cb: cb,
+        });
+    }
+
     onRemove(cb: PlayerEventCallback): void {
         this.on(CustomEventType.PLAYER_DESTROY, () => {
             this.reset();
@@ -198,41 +216,16 @@ export class PlaykitPlayerAdaptor implements IPlayerAdaptorApi {
         });
     }
 
-    onCaptureUIEvent(cb: CaptureUIEventCallback) {
-        if (this.captureUIDispose) {
-            this.captureUIDispose();
-        }
-        const { element } = this;
-        const progressBarEl = element?.querySelector('.playkit-seek-bar') as HTMLElement;
-        const mouseDownHandler = (ev: MouseEvent) => {
-            const { clientX } = ev;
-            const rect = progressBarEl.getBoundingClientRect();
-            const timestamp = (clientX - rect.x) / rect.width * this.duration();
-            cb({ ev, timestamp });
-        };
-        const keyDownHandler = (ev: KeyboardEvent) => {
-            cb({ ev });
-        };
-
-        progressBarEl?.addEventListener('mousedown', mouseDownHandler , { capture: true });
-        progressBarEl?.addEventListener('keydown', keyDownHandler, { capture: true });
-
-        this.captureUIDispose = () => {
-            progressBarEl.removeEventListener('mousedown', mouseDownHandler, { capture: true });
-            progressBarEl.removeEventListener('keydown', keyDownHandler, { capture: true });
-        };
-    }
-
     private reset() {
         for (const ev of this.events) {
             this.player.removeEventListener(ev.event, ev.fn);
         }
-        if (this.captureUIDispose) {
-            this.captureUIDispose();
-        }
-
         this.events = [];
         this.element = undefined;
+        if (this.captureUIDisposable) {
+            this.captureUIDisposable.dispose();
+            this.captureUIDisposable = undefined;
+        }
     }
 
     private on(event: string, fn: PlaykitListenerType) {
